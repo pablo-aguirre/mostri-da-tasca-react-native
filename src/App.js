@@ -1,10 +1,11 @@
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import {globalStyles} from "../styles/global";
+import RankingScreen from "./screens/RankingScreen";
 
 export default function App() {
   return (
       <View style={globalStyles.container}>
-        <Text>init app!</Text>
+        <RankingScreen />
       </View>
   );
 }
