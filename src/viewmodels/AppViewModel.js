@@ -1,6 +1,10 @@
+import CommunicationController from "../models/CommunicationController";
+
 export default class AppViewModel {
 
     getSid() {
-        return 'MOVZg1fdqSXRsMWwnnFY';
+        let result = CommunicationController.newSession()
+        result.then(result => console.log(result))
+        return result;
     }
 }
