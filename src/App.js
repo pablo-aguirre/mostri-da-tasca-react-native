@@ -3,6 +3,7 @@ import {globalStyles} from "../styles/global";
 import RankingScreen from "./screens/RankingScreen";
 import {useEffect, useState} from "react";
 import AppViewModel from "./viewmodels/AppViewModel";
+import ProfileScreen from "./screens/ProfileScreen";
 
 export default function App() {
     const [viewModel] = useState(new AppViewModel())
@@ -18,7 +19,7 @@ export default function App() {
         <View style={globalStyles.container}>
             {
                 session.sid === undefined ? <ActivityIndicator size='large'/> :
-                <RankingScreen sid={session.sid}/>
+                <ProfileScreen sid={session.sid}/>
             }
         </View>
     );
