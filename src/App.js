@@ -9,7 +9,7 @@ export default function App() {
     const [session, setSession] = useState({sid: undefined, uid: undefined})
 
     useEffect(() => {
-        viewModel.getSid().then(result => {
+        viewModel.getSession().then(result => {
             setSession(result)
         })
     }, []);
