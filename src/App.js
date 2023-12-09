@@ -19,7 +19,7 @@ export default function App() {
         <View style={globalStyles.container}>
             {
                 session.sid === undefined ? <ActivityIndicator size='large'/> :
-                <ProfileScreen sid={session.sid}/>
+                <ProfileScreen session={session}/>
             }
         </View>
     );
