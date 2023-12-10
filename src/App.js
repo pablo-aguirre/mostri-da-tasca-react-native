@@ -1,4 +1,4 @@
-import {ActivityIndicator, View} from 'react-native';
+import {ActivityIndicator, SafeAreaView, View} from 'react-native';
 import {globalStyles} from "../styles/global";
 import RankingScreen from "./screens/RankingScreen";
 import {useEffect, useState} from "react";
@@ -16,11 +16,11 @@ export default function App() {
     }, []);
 
     return (
-        <View style={globalStyles.container}>
+        <SafeAreaView style={globalStyles.container}>
             {
                 session.sid === undefined ? <ActivityIndicator size='large'/> :
                 <ProfileScreen session={session}/>
             }
-        </View>
+        </SafeAreaView>
     );
 }

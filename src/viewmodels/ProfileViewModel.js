@@ -10,7 +10,7 @@ export default class ProfileViewModel {
         return CommunicationController.userInformation(this.sid, this.uid)
     }
 
-    updateName(name) {
-        CommunicationController.updateUser(this.sid, this.uid, name).catch(error => console.error(error))
+    updateUser(user) {
+        CommunicationController.updateUser(this.sid, this.uid, user.name, user.positionshare, user.picture).catch(error => console.error(error))
     }
 }

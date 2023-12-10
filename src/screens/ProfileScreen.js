@@ -1,5 +1,5 @@
-import {Button, Card, Input} from "@rneui/themed";
-import {ActivityIndicator, SafeAreaView, View} from "react-native";
+import {Avatar, Button, Icon, ListItem, Switch, Text} from "@rneui/themed";
+import {ActivityIndicator, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
 
@@ -24,26 +24,52 @@ export default function ProfileScreen({session}) {
     const toggleEdit = () => {
         setEditing(!editing)
     }
-
+    console.log(`[ProfileScreen] ${JSON.stringify(user)}`);
     return (
         <>
             {
-                user === undefined ? <ActivityIndicator/> :
-                    <>
-                        {editing ?
-                            <View >
-                                <Input value={user.name} onChangeText={(text) => setUser({...user, name: text})}/>
-                                <Button title='OK' onPress={() => {
-                                    viewModel.updateName(user.name)
-                                    toggleEdit()
-                                }}/>
-                            </View> :
-                            <>
-                                <Card.Title> {user.name}</Card.Title>
-                                <Button title='Modifica' onPress={() => toggleEdit()}/>
-                            </>
-                        }
-                    </>
+                user === undefined ? <ActivityIndicator size="large"/> :
+                    <ListItem bottomDivider>
+                        <Avatar rounded
+                                size="large"
+                                title={user.name.charAt(0)}
+                                source={{uri: `data:image/jpg;base64,${user.picture}`}}
+                        >
+                            {editing ? <Avatar.Accessory size={23} onPress={() => console.log('Avatar.Accessory')}/>:''}
+                        </Avatar>
+
+                        <ListItem.Content>
+                            <ListItem.Input
+                                disabled={!editing}
+                                value={user.name}
+                                inputStyle={{textAlign: 'left', fontSize: 25}}
+                                onChangeText={(text) => setUser({...user, name:text})}
+                            />
+                            <View style={{flexDirection: 'row', paddingLeft: 10, paddingTop: 5}}>
+                                <Icon
+                                    type="material"
+                                    name={user.positionshare ? "location-on" : "location-off"}
+                                    size={25}
+                                    style={{padding: 5}}
+                                />
+                                <Text style={{fontSize: 20, padding: 5}}>
+                                    Position
+                                </Text>
+                                {
+                                    editing ? <Switch value={user.positionshare} onChange={() => setUser({...user, positionshare: !user.positionshare})}/> : ''
+                                }
+                            </View>
+                        </ListItem.Content>
+                        <ListItem.Content right>
+                            <Button onPress={() => {
+                                if (editing)
+                                    viewModel.updateUser(user)
+                                setEditing(!editing)
+                            }}>
+                                <Icon type="material" name={editing ? 'save' : 'edit'} color="white" />
+                            </Button>
+                        </ListItem.Content>
+                    </ListItem>
             }
         </>
     )
