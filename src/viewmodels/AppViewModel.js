@@ -10,7 +10,7 @@ export default class AppViewModel {
                 session = await CommunicationController.newSession()
                 await AsyncStorage.setItem('session', JSON.stringify(session))
             }
-            console.log(`[getSession] ${session}`);
+            console.log(`[AppViewModel] session = ${session}`);
             return JSON.parse(session)
         } catch (e) {
             console.error(e)

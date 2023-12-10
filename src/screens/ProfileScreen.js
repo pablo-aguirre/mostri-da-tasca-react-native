@@ -19,12 +19,13 @@ export default function ProfileScreen({session}) {
 
     useEffect(() => {
         viewModel.getUser().then(result => setUser(result))
+        console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
 
     const toggleEdit = () => {
         setEditing(!editing)
     }
-    console.log(`[ProfileScreen] ${JSON.stringify(user)}`);
+
     return (
         <>
             {
@@ -62,6 +63,7 @@ export default function ProfileScreen({session}) {
                         </ListItem.Content>
                         <ListItem.Content right>
                             <Button onPress={() => {
+                                console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
                                 if (editing)
                                     viewModel.updateUser(user)
                                 setEditing(!editing)
