@@ -5,13 +5,13 @@ import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import {COLORS, globalStyles} from "../../styles/global";
 import * as ImagePicker from "expo-image-picker";
 
-/** TODO
- *  - immagine del profilo (modificabile)
- *  - nome utente (modificabile)
- *  - posizione condivisa (booleano modificabile)
- *  - punti vita
- *  - punti esperienza
- *  - artefatti
+
+/** TODO immagine del profilo
+ *  - sistemare caricamento annullato (aperta Picker e premuto cancel)
+ *  - controlli sull'immagine troppo grande
+ */
+/** TODO artefatti
+ *  - aggiungere uno header, se presenti artefatti
  */
 export default function ProfileScreen({session}) {
     const [viewModel] = useState(new ProfileViewModel(session))
