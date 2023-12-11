@@ -25,7 +25,7 @@ export default function ProfileScreen({session}) {
     return (
         <>
             {user === undefined ? <ActivityIndicator size="large"/> :
-                <>
+                <View style={{paddingHorizontal: 10}}>
                     <Card containerStyle={{borderWidth: 0, shadowColor: 'transparent'}}>
                         <Card.Title h4>
                             {user.name}
@@ -36,7 +36,8 @@ export default function ProfileScreen({session}) {
                             size="xlarge"
                             title={user.name.charAt(0)}
                             source={{uri: `data:image/jpg;base64,${user.picture}`}}>
-                            <Avatar.Accessory color={COLORS.blue} reverse name={editing ? 'check' : 'edit'} size={18}
+                            <Avatar.Accessory color={COLORS.blue} reverse name={editing ? 'check' : 'edit'}
+                                              size={18}
                                               onPress={() => {
                                                   console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
                                                   if (editing) viewModel.updateUser(user)
@@ -45,50 +46,41 @@ export default function ProfileScreen({session}) {
                             />
                         </Avatar>
                     </Card>
-                    <View style={{paddingHorizontal: 10}}>
-                        <ListItem>
-                            <Icon name='badge' color={COLORS.blue}/>
-                            <ListItem.Content>
-                                <ListItem.Title>Name</ListItem.Title>
-                            </ListItem.Content>
-                            <ListItem.Input
-                                disabled={!editing}
-                                value={user.name}
-                                onChangeText={(text) => setUser({...user, name: text})}
-                            />
-                            <ListItem.Chevron/>
-                        </ListItem>
-                        <ListItem>
-                            <Icon name={user.positionshare ? 'location-on' : 'location-off'} color={COLORS.blue}/>
-                            <ListItem.Content>
-                                <ListItem.Title>{user.positionshare ? "Shared position" : "Not shared"}</ListItem.Title>
-                            </ListItem.Content>
-                            <Switch
-                                disabled={!editing}
-                                value={user.positionshare}
-                                onChange={() => setUser({...user, positionshare: !user.positionshare})}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <Icon name='favorite' color={COLORS.blue}/>
-                            <ListItem.Content>
-                                <ListItem.Title>Life points</ListItem.Title>
-                            </ListItem.Content>
-                            <ListItem.Content right>
-                                <ListItem.Title>{user.life}</ListItem.Title>
-                            </ListItem.Content>
-                        </ListItem>
-                        <ListItem>
-                            <Icon name='bar-chart' color={COLORS.blue}/>
-                            <ListItem.Content>
-                                <ListItem.Title>Experience</ListItem.Title>
-                            </ListItem.Content>
-                            <ListItem.Content right>
-                                <ListItem.Title>{user.experience}</ListItem.Title>
-                            </ListItem.Content>
-                        </ListItem>
-                    </View>
-                </>
+                    <GenericDetail icon='badge' title='Name'>
+                        <ListItem.Input
+                            disabled={!editing}
+                            value={user.name}
+                            onChangeText={(text) => setUser({...user, name: text})}
+                        />
+                        <ListItem.Chevron/>
+                    </GenericDetail>
+                    <GenericDetail icon={user.positionshare ? 'location-on' : 'location-off'}
+                                   title={user.positionshare ? "Shared position" : "Not shared"}>
+                        <Switch
+                            disabled={!editing}
+                            value={user.positionshare}
+                            onChange={() => setUser({...user, positionshare: !user.positionshare})}
+                        />
+                    </GenericDetail>
+                    <GenericDetail icon='favorite' title='Life points' value={user.life}/>
+                    <GenericDetail icon='bar-chart' title='Experience' value={user.experience}/>
+                </View>
             }
-        </>)
+        </>
+    )
+}
+
+function GenericDetail({icon, title, value, children}) {
+    return (
+        <ListItem>
+            <Icon name={icon} color={COLORS.blue}/>
+            <ListItem.Content>
+                <ListItem.Title>{title}</ListItem.Title>
+            </ListItem.Content>
+            {
+                children === undefined ?
+                    <ListItem.Content right><ListItem.Title>{value}</ListItem.Title></ListItem.Content> : children
+            }
+        </ListItem>
+    )
 }
