@@ -29,6 +29,15 @@ export default function ProfileScreen({session}) {
                     <Card containerStyle={{borderWidth: 0, shadowColor: 'transparent'}}>
                         <Card.Title h4>
                             {user.name}
+                            <Icon name={editing ? 'done' : 'edit'}
+                                  color={COLORS.blue}
+                                  style={{marginLeft: 5}}
+                                  onPress={() => {
+                                      console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
+                                      if (editing) viewModel.updateUser(user)
+                                      setEditing(!editing)
+                                  }}
+                            />
                         </Card.Title>
                         <Avatar
                             rounded
@@ -36,14 +45,9 @@ export default function ProfileScreen({session}) {
                             size="xlarge"
                             title={user.name.charAt(0)}
                             source={{uri: `data:image/jpg;base64,${user.picture}`}}>
-                            <Avatar.Accessory color={COLORS.blue} reverse name={editing ? 'check' : 'edit'}
-                                              size={18}
-                                              onPress={() => {
-                                                  console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
-                                                  if (editing) viewModel.updateUser(user)
-                                                  setEditing(!editing)
-                                              }}
-                            />
+                            {editing &&
+                                <Avatar.Accessory color={COLORS.blue} reverse size={18}/>
+                            }
                         </Avatar>
                     </Card>
                     <GenericDetail icon='badge' title='Name'>
@@ -107,7 +111,7 @@ function ListArtifacts({user, viewModel}) {
                     rounded
                     containerStyle={globalStyles.avatar}
                     size="medium"
-                    icon={{name: icons[item.type], type:'material'}}
+                    icon={{name: icons[item.type], type: 'material'}}
                     source={{uri: `data:image/jpg;base64,${item.image}`}}
                 />
                 <GenericDetail title='Type' value={item.type}/>
