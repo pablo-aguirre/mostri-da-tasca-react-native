@@ -1,5 +1,5 @@
 import {Avatar, Card, Icon, ListItem, Switch} from "@rneui/themed";
-import {ActivityIndicator, View} from "react-native";
+import {ActivityIndicator, FlatList, ScrollView, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import {COLORS, globalStyles} from "../../styles/global";
@@ -23,7 +23,7 @@ export default function ProfileScreen({session}) {
     }, []);
 
     return (
-        <>
+        <ScrollView>
             {user === undefined ? <ActivityIndicator size="large"/> :
                 <View style={{paddingHorizontal: 10}}>
                     <Card containerStyle={{borderWidth: 0, shadowColor: 'transparent'}}>
@@ -55,7 +55,8 @@ export default function ProfileScreen({session}) {
                         <ListItem.Chevron/>
                     </GenericDetail>
                     <GenericDetail icon={user.positionshare ? 'location-on' : 'location-off'}
-                                   title={user.positionshare ? "Shared position" : "Not shared"}>
+                                   title={user.positionshare ? "Shared position" : "Not shared"}
+                                   bottomDivider>
                         <Switch
                             disabled={!editing}
                             value={user.positionshare}
@@ -64,15 +65,16 @@ export default function ProfileScreen({session}) {
                     </GenericDetail>
                     <GenericDetail icon='favorite' title='Life points' value={user.life}/>
                     <GenericDetail icon='bar-chart' title='Experience' value={user.experience}/>
+                    <ListArtifacts user={user} viewModel={viewModel}/>
                 </View>
             }
-        </>
+        </ScrollView>
     )
 }
 
-function GenericDetail({icon, title, value, children}) {
+function GenericDetail({icon, title, value, children, bottomDivider}) {
     return (
-        <ListItem>
+        <ListItem bottomDivider={bottomDivider}>
             <Icon name={icon} color={COLORS.blue}/>
             <ListItem.Content>
                 <ListItem.Title>{title}</ListItem.Title>
@@ -82,5 +84,35 @@ function GenericDetail({icon, title, value, children}) {
                     <ListItem.Content right><ListItem.Title>{value}</ListItem.Title></ListItem.Content> : children
             }
         </ListItem>
+    )
+}
+
+function ListArtifacts({user, viewModel}) {
+    const [artifacts, setArtifacts] = useState()
+    const [icons] = useState({weapon: 'hardware', armor: 'security', amulet: 'science'})
+
+    useEffect(() => {
+        viewModel.getArtifacts(user).then(result => {
+            setArtifacts(result)
+            console.log(`[ListArtifacts] ${JSON.stringify(artifacts)}`)
+        })
+    }, []);
+
+    return (
+        <FlatList horizontal data={artifacts} renderItem={({item}) =>
+            <Card>
+                <Card.Title>{item.name}</Card.Title>
+                <Card.Divider/>
+                <Avatar
+                    rounded
+                    containerStyle={globalStyles.avatar}
+                    size="medium"
+                    icon={{name: icons[item.type], type:'material'}}
+                    source={{uri: `data:image/jpg;base64,${item.image}`}}
+                />
+                <GenericDetail title='Type' value={item.type}/>
+                <GenericDetail title='Level' value={item.level}/>
+            </Card>
+        }/>
     )
 }

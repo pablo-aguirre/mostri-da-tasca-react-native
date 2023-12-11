@@ -13,4 +13,12 @@ export default class ProfileViewModel {
     updateUser(user) {
         CommunicationController.updateUser(this.sid, this.uid, user.name, user.positionshare, user.picture).catch(error => console.error(error))
     }
+
+    async getArtifacts(user) {
+        let artifacts = []
+        for (let artifact of ['weapon', 'armor', 'amulet'])
+            if (user[artifact])
+                artifacts.push(await CommunicationController.objectInformation(this.sid, user[artifact]))
+        return artifacts
+    }
 }
