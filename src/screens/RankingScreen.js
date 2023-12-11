@@ -18,7 +18,7 @@ export default function RankingScreen({sid}) {
     }, []);
 
     return (
-        <SafeAreaView>
+        <>
             {
                 rankingData.length === 0 ? <ActivityIndicator size="large"/> :
                     <View>
@@ -33,7 +33,7 @@ export default function RankingScreen({sid}) {
                         />
                     </View>
             }
-        </SafeAreaView>
+        </>
     );
 }
 
