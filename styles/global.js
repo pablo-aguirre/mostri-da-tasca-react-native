@@ -9,7 +9,8 @@ export const globalStyles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: lightColors.greyOutline,
     },
-    avatar: {alignSelf: 'center'}
+    avatar: {alignSelf: 'center'},
+    cardWithoutBorder: {borderWidth: 0, shadowColor: 'transparent'}
 });
 
 export const COLORS = {

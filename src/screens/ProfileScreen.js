@@ -10,6 +10,7 @@ import * as ImagePicker from "expo-image-picker";
  *  - sistemare caricamento annullato (aperta Picker e premuto cancel)
  *  - controlli sull'immagine troppo grande
  */
+
 /** TODO artefatti
  *  - aggiungere uno header, se presenti artefatti
  */
@@ -38,10 +39,10 @@ export default function ProfileScreen({session}) {
 
 
     return (
-        <ScrollView>
+        <ScrollView style={{paddingHorizontal: 5}}>
             {user === undefined ? <ActivityIndicator size="large"/> :
-                <View style={{paddingHorizontal: 10}}>
-                    <Card containerStyle={{borderWidth: 0, shadowColor: 'transparent'}}>
+                <View>
+                    <Card containerStyle={globalStyles.cardWithoutBorder}>
                         <Card.Title h4>
                             {user.name}
                             <Icon name={editing ? 'done' : 'edit'}
