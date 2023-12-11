@@ -1,8 +1,8 @@
-import {Avatar, Button, Icon, ListItem, Switch, Text} from "@rneui/themed";
+import {Avatar, Card, Icon, ListItem, Switch} from "@rneui/themed";
 import {ActivityIndicator, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
-
+import {COLORS, globalStyles} from "../../styles/global";
 
 /** TODO
  *  - immagine del profilo (modificabile)
@@ -22,57 +22,73 @@ export default function ProfileScreen({session}) {
         console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
 
-    const toggleEdit = () => {
-        setEditing(!editing)
-    }
-
     return (
         <>
-            {
-                user === undefined ? <ActivityIndicator size="large"/> :
-                    <ListItem bottomDivider>
-                        <Avatar rounded
-                                size="large"
-                                title={user.name.charAt(0)}
-                                source={{uri: `data:image/jpg;base64,${user.picture}`}}
-                        >
-                            {editing ? <Avatar.Accessory size={23} onPress={() => console.log('Avatar.Accessory')}/>:''}
+            {user === undefined ? <ActivityIndicator size="large"/> :
+                <>
+                    <Card containerStyle={{borderWidth: 0, shadowColor: 'transparent'}}>
+                        <Card.Title h4>
+                            {user.name}
+                        </Card.Title>
+                        <Avatar
+                            rounded
+                            containerStyle={globalStyles.avatar}
+                            size="xlarge"
+                            title={user.name.charAt(0)}
+                            source={{uri: `data:image/jpg;base64,${user.picture}`}}>
+                            <Avatar.Accessory color={COLORS.blue} reverse name={editing ? 'check' : 'edit'} size={18}
+                                              onPress={() => {
+                                                  console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
+                                                  if (editing) viewModel.updateUser(user)
+                                                  setEditing(!editing)
+                                              }}
+                            />
                         </Avatar>
-
-                        <ListItem.Content>
+                    </Card>
+                    <View style={{paddingHorizontal: 10}}>
+                        <ListItem>
+                            <Icon name='badge' color={COLORS.blue}/>
+                            <ListItem.Content>
+                                <ListItem.Title>Name</ListItem.Title>
+                            </ListItem.Content>
                             <ListItem.Input
                                 disabled={!editing}
                                 value={user.name}
-                                inputStyle={{textAlign: 'left', fontSize: 25}}
-                                onChangeText={(text) => setUser({...user, name:text})}
+                                onChangeText={(text) => setUser({...user, name: text})}
                             />
-                            <View style={{flexDirection: 'row', paddingLeft: 10, paddingTop: 5}}>
-                                <Icon
-                                    type="material"
-                                    name={user.positionshare ? "location-on" : "location-off"}
-                                    size={25}
-                                    style={{padding: 5}}
-                                />
-                                <Text style={{fontSize: 20, padding: 5}}>
-                                    Position
-                                </Text>
-                                {
-                                    editing ? <Switch value={user.positionshare} onChange={() => setUser({...user, positionshare: !user.positionshare})}/> : ''
-                                }
-                            </View>
-                        </ListItem.Content>
-                        <ListItem.Content right>
-                            <Button onPress={() => {
-                                console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
-                                if (editing)
-                                    viewModel.updateUser(user)
-                                setEditing(!editing)
-                            }}>
-                                <Icon type="material" name={editing ? 'save' : 'edit'} color="white" />
-                            </Button>
-                        </ListItem.Content>
-                    </ListItem>
+                            <ListItem.Chevron/>
+                        </ListItem>
+                        <ListItem>
+                            <Icon name={user.positionshare ? 'location-on' : 'location-off'} color={COLORS.blue}/>
+                            <ListItem.Content>
+                                <ListItem.Title>{user.positionshare ? "Shared position" : "Not shared"}</ListItem.Title>
+                            </ListItem.Content>
+                            <Switch
+                                disabled={!editing}
+                                value={user.positionshare}
+                                onChange={() => setUser({...user, positionshare: !user.positionshare})}
+                            />
+                        </ListItem>
+                        <ListItem>
+                            <Icon name='favorite' color={COLORS.blue}/>
+                            <ListItem.Content>
+                                <ListItem.Title>Life points</ListItem.Title>
+                            </ListItem.Content>
+                            <ListItem.Content right>
+                                <ListItem.Title>{user.life}</ListItem.Title>
+                            </ListItem.Content>
+                        </ListItem>
+                        <ListItem>
+                            <Icon name='bar-chart' color={COLORS.blue}/>
+                            <ListItem.Content>
+                                <ListItem.Title>Experience</ListItem.Title>
+                            </ListItem.Content>
+                            <ListItem.Content right>
+                                <ListItem.Title>{user.experience}</ListItem.Title>
+                            </ListItem.Content>
+                        </ListItem>
+                    </View>
+                </>
             }
-        </>
-    )
+        </>)
 }
