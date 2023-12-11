@@ -3,6 +3,7 @@ import {ActivityIndicator, FlatList, ScrollView, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import {COLORS, globalStyles} from "../../styles/global";
+import * as ImagePicker from "expo-image-picker";
 
 /** TODO
  *  - immagine del profilo (modificabile)
@@ -21,6 +22,20 @@ export default function ProfileScreen({session}) {
         viewModel.getUser().then(result => setUser(result)).catch(error => console.error(`[ProfileScreen] ${error}`))
         console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            base64: true,
+            quality: 0
+        });
+
+        if (!result.canceled)
+            return result.base64
+        else
+            return ''
+    };
+
 
     return (
         <ScrollView>
@@ -45,8 +60,12 @@ export default function ProfileScreen({session}) {
                             size="xlarge"
                             title={user.name.charAt(0)}
                             source={{uri: `data:image/jpg;base64,${user.picture}`}}>
+
                             {editing &&
-                                <Avatar.Accessory color={COLORS.blue} reverse size={18}/>
+                                <Avatar.Accessory color={COLORS.blue} reverse size={18}
+                                                  onPress={() =>
+                                                      pickImage().then(result => setUser({...user, picture: result}))}
+                                />
                             }
                         </Avatar>
                     </Card>
