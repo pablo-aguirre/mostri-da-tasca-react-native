@@ -18,7 +18,7 @@ export default function ProfileScreen({session}) {
     const [editing, setEditing] = useState(false)
 
     useEffect(() => {
-        viewModel.getUser().then(result => setUser(result))
+        viewModel.getUser().then(result => setUser(result)).catch(error => console.error(`[ProfileScreen] ${error}`))
         console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
 
@@ -92,18 +92,18 @@ function GenericDetail({icon, title, value, children, bottomDivider}) {
 }
 
 function ListArtifacts({user, viewModel}) {
-    const [artifacts, setArtifacts] = useState()
+    const [artifacts, setArtifacts] = useState([])
     const [icons] = useState({weapon: 'hardware', armor: 'security', amulet: 'science'})
 
     useEffect(() => {
         viewModel.getArtifacts(user).then(result => {
             setArtifacts(result)
             console.log(`[ListArtifacts] ${JSON.stringify(artifacts)}`)
-        })
+        }).catch(error => console.error(`[ListArtifacts] ${error}`))
     }, []);
 
     return (
-        <FlatList horizontal data={artifacts} renderItem={({item}) =>
+        <FlatList horizontal data={artifacts} keyExtractor={(item) => item.id} renderItem={({item}) =>
             <Card>
                 <Card.Title>{item.name}</Card.Title>
                 <Card.Divider/>
