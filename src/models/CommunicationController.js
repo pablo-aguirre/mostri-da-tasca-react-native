@@ -3,8 +3,8 @@ export default class CommunicationController {
 
     static async genericRequest(endpoint, verb, queryParams = {}, bodyParams = {}) {
         const queryParamsFormatted = new URLSearchParams(queryParams).toString()
-        const url = this.BASE_URL + endpoint + (!queryParamsFormatted ? '' : '?' + queryParamsFormatted)
-        console.log('Sending ' + verb + " request to: " + url)
+        const url = `${this.BASE_URL}${endpoint}${!queryParamsFormatted ? '' : '?' + queryParamsFormatted}`
+        console.log(`[CommunicationController] Request ${verb} to ${url} ...`);
 
         let fetchData = {method: verb, headers: {Accept: 'application/json', 'Content-Type': 'application/json'}}
 
@@ -14,11 +14,11 @@ export default class CommunicationController {
 
         const status = httpResponse.status
         if (status === 200) {
-            console.log('Request ' + verb + ' to ' + url + ' successful')
+            console.log(`[CommunicationController] Request ${verb} to ${url} successful`);
             return await httpResponse.json()
         } else {
             const message = await httpResponse.text()
-            console.error('Request ' + verb + ' to ' + url + ' NOT SUCCESSFUL with error code ' + message)
+            console.error(`[CommunicationController] Request ${verb} to ${url} not successful with error code ${message} `)
             throw new Error(status + ", " + message)
         }
     }
