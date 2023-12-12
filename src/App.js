@@ -1,13 +1,12 @@
-import {ActivityIndicator, SafeAreaView, View} from 'react-native';
-import {globalStyles} from "../styles/global";
-import RankingScreen from "./screens/RankingScreen";
 import {useEffect, useState} from "react";
 import AppViewModel from "./viewmodels/AppViewModel";
+import {BottomNavigation, PaperProvider} from "react-native-paper";
+import RankingScreen from "./screens/RankingScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 
 export default function App() {
     const [viewModel] = useState(new AppViewModel())
-    const [session, setSession] = useState({sid: undefined, uid: undefined})
+    const [session, setSession] = useState(null)
 
     useEffect(() => {
         viewModel.getSession().then(result => {
@@ -15,12 +14,23 @@ export default function App() {
         })
     }, []);
 
+    const [index, setIndex] = useState(0)
+    const [routes] = useState([
+        {key: 'ranking', title: 'Ranking'},
+        {key: 'profile', title: 'Profile'}
+    ])
+
+    const renderScene = BottomNavigation.SceneMap({
+        ranking: () => <RankingScreen sid={session.sid}/>,
+        profile: () => <ProfileScreen session={session}/>
+    })
+
     return (
-        <SafeAreaView style={globalStyles.container}>
-            {
-                session.sid === undefined ? <ActivityIndicator size='large'/> :
-                <ProfileScreen session={session}/>
+        <PaperProvider>
+            {session &&
+                <BottomNavigation navigationState={{index, routes}} onIndexChange={setIndex}
+                                  renderScene={renderScene}/>
             }
-        </SafeAreaView>
+        </PaperProvider>
     );
 }
