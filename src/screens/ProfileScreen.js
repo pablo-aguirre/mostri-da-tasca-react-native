@@ -2,7 +2,18 @@ import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import * as ImagePicker from "expo-image-picker";
 import {
-    ActivityIndicator, Appbar, Avatar, Button, Dialog, Divider, IconButton, List, Portal, Switch, Text, TextInput
+    ActivityIndicator,
+    Appbar,
+    Avatar,
+    Button,
+    Dialog,
+    Divider,
+    IconButton,
+    List,
+    Portal,
+    Switch,
+    Text,
+    TextInput
 } from "react-native-paper";
 import {ScrollView} from "react-native";
 import {globalStyles} from "../../styles/global";
@@ -22,22 +33,22 @@ export default function ProfileScreen({session}) {
     const [editName, setEditName] = useState(false)
 
     useEffect(() => {
-        viewModel.getUser().then(result => setUser(result)
-        ).catch(error => console.error(`[ProfileScreen] ${error}`))
+        viewModel.getUser()
+            .then(result => setUser(result))
+            .catch(error => console.error(`[ProfileScreen] ${error}`))
         console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+    const updateImage = async () => {
+        let image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             base64: true,
             quality: 0
         });
-
-        if (!result.canceled)
-            return result.base64
-        else
-            return ''
+        if (!image.canceled)
+            viewModel.updateUser({...user, picture: image.assets[0].base64})
+                .then(() => setUser({...user, picture: image.assets[0].base64}))
+                .catch(error => console.error(`[ProfileScreen] ${error}`))
     };
 
     return (
@@ -57,7 +68,7 @@ export default function ProfileScreen({session}) {
                         <Avatar.Text size={150} style={{alignSelf: 'center'}} label={user.name.charAt(0)}/>
                     }
                     <IconButton size={15} icon='camera' selected style={{alignSelf: 'center'}}
-                                onPress={() => console.log('camera')}/>
+                                onPress={() => updateImage()}/>
                     <List.Item
                         title='Name'
                         left={() => <List.Icon icon='account-details'/>}
@@ -68,10 +79,9 @@ export default function ProfileScreen({session}) {
                         title={user.positionshare ? 'Position shared' : 'Position not shared'}
                         left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}
                         right={() => <Switch value={user.positionshare} onValueChange={(value) => {
-                            viewModel.updateUser({...user, positionshare: value}).then(() => setUser({
-                                ...user,
-                                positionshare: value
-                            })).catch(error => console.error(error))
+                            viewModel.updateUser({...user, positionshare: value})
+                                .then(() => setUser({...user, positionshare: value}))
+                                .catch(error => console.error(`[ProfileScreen] ${error}`))
                         }}/>}
                     />
                     <Divider/>
@@ -96,10 +106,9 @@ function EditName({visible, setVisible, user, setUser, vm}) {
                     <Button onPress={() => setVisible(false)}>Cancel</Button>
                     <Button onPress={() => {
                         if (user.name !== newName && newName !== undefined) {
-                            vm.updateUser({...user, name: newName}).then(() => setUser({
-                                ...user,
-                                name: newName
-                            })).catch(error => console.error(error))
+                            vm.updateUser({...user, name: newName})
+                                .then(() => setUser({...user, name: newName}))
+                                .catch(error => console.error(`[ProfileScreen] ${error}`))
                             setVisible(false)
                         }
                     }} disabled={newName.trim() === '' || newName.length >= 15}>Ok</Button>

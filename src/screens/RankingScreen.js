@@ -16,7 +16,9 @@ export default function RankingScreen({sid}) {
     }
 
     useEffect(() => {
-        viewModel.getRanking().then(result => setRankingData(result)).catch(error => console.error(error))
+        viewModel.getRanking()
+            .then(result => setRankingData(result))
+            .catch(error => console.error(`[RankingScreen] ${error}`))
     }, []);
 
     return (
