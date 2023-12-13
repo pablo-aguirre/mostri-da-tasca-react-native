@@ -10,8 +10,8 @@ export default class ProfileViewModel {
         return CommunicationController.userInformation(this.sid, this.uid)
     }
 
-    updateUser(user) {
-        CommunicationController.updateUser(this.sid, this.uid, user.name, user.positionshare, user.picture).catch(error => console.error(error))
+    async updateUser(user) {
+        await CommunicationController.updateUser(this.sid, this.uid, user.name, user.positionshare, user.picture)
     }
 
     async getArtifacts(user) {

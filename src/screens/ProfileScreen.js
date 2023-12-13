@@ -1,9 +1,11 @@
-import {Avatar, Card, Icon, ListItem, Switch} from "@rneui/themed";
-import {ActivityIndicator, FlatList, ScrollView, View} from "react-native";
 import React, {useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
-import {COLORS, globalStyles} from "../../styles/global";
 import * as ImagePicker from "expo-image-picker";
+import {
+    ActivityIndicator, Appbar, Avatar, Button, Dialog, Divider, IconButton, List, Portal, Switch, Text, TextInput
+} from "react-native-paper";
+import {ScrollView} from "react-native";
+import {globalStyles} from "../../styles/global";
 
 
 /** TODO immagine del profilo
@@ -16,11 +18,12 @@ import * as ImagePicker from "expo-image-picker";
  */
 export default function ProfileScreen({session}) {
     const [viewModel] = useState(new ProfileViewModel(session))
-    const [user, setUser] = useState()
-    const [editing, setEditing] = useState(false)
+    const [user, setUser] = useState(null)
+    const [editName, setEditName] = useState(false)
 
     useEffect(() => {
-        viewModel.getUser().then(result => setUser(result)).catch(error => console.error(`[ProfileScreen] ${error}`))
+        viewModel.getUser().then(result => setUser(result)
+        ).catch(error => console.error(`[ProfileScreen] ${error}`))
         console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
     }, []);
 
@@ -37,106 +40,71 @@ export default function ProfileScreen({session}) {
             return ''
     };
 
-
     return (
-        <ScrollView style={{paddingHorizontal: 5}}>
-            {user === undefined ? <ActivityIndicator size="large"/> :
-                <View>
-                    <Card containerStyle={globalStyles.cardWithoutBorder}>
-                        <Card.Title h4>
-                            {user.name}
-                            <Icon name={editing ? 'done' : 'edit'}
-                                  color={COLORS.blue}
-                                  style={{marginLeft: 5}}
-                                  onPress={() => {
-                                      console.log(`[ProfileScreen] user = ${JSON.stringify(user)}`)
-                                      if (editing) viewModel.updateUser(user)
-                                      setEditing(!editing)
-                                  }}
-                            />
-                        </Card.Title>
-                        <Avatar
-                            rounded
-                            containerStyle={globalStyles.avatar}
-                            size="xlarge"
-                            title={user.name.charAt(0)}
-                            source={{uri: `data:image/jpg;base64,${user.picture}`}}>
+        <>
+            <Appbar.Header mode='small' elevated>
+                <Appbar.Content title="Profile"/>
+            </Appbar.Header>
+            {!user ? <ActivityIndicator size='large'/> :
+                <ScrollView style={globalStyles.screen}>
+                    {editName && <EditName visible={editName} setVisible={setEditName} user={user} setUser={setUser}
+                                           vm={viewModel}/>}
+                    <Text variant='headlineMedium' style={{alignSelf: 'center'}}>{user.name}</Text>
 
-                            {editing &&
-                                <Avatar.Accessory color={COLORS.blue} reverse size={18}
-                                                  onPress={() =>
-                                                      pickImage().then(result => setUser({...user, picture: result}))}
-                                />
-                            }
-                        </Avatar>
-                    </Card>
-                    <GenericDetail icon='badge' title='Name'>
-                        <ListItem.Input
-                            disabled={!editing}
-                            value={user.name}
-                            onChangeText={(text) => setUser({...user, name: text})}
-                        />
-                        <ListItem.Chevron/>
-                    </GenericDetail>
-                    <GenericDetail icon={user.positionshare ? 'location-on' : 'location-off'}
-                                   title={user.positionshare ? "Shared position" : "Not shared"}
-                                   bottomDivider>
-                        <Switch
-                            disabled={!editing}
-                            value={user.positionshare}
-                            onChange={() => setUser({...user, positionshare: !user.positionshare})}
-                        />
-                    </GenericDetail>
-                    <GenericDetail icon='favorite' title='Life points' value={user.life}/>
-                    <GenericDetail icon='bar-chart' title='Experience' value={user.experience}/>
-                    <ListArtifacts user={user} viewModel={viewModel}/>
-                </View>
+                    {user.picture ?
+                        <Avatar.Image size={150} style={{alignSelf: 'center'}}
+                                      source={{uri: `data:image/jpg;base64,${user.picture}`}}/> :
+                        <Avatar.Text size={150} style={{alignSelf: 'center'}} label={user.name.charAt(0)}/>
+                    }
+                    <IconButton size={15} icon='camera' selected style={{alignSelf: 'center'}}
+                                onPress={() => console.log('camera')}/>
+                    <List.Item
+                        title='Name'
+                        left={() => <List.Icon icon='account-details'/>}
+                        right={() => <IconButton icon='account-edit' mode={'contained'}
+                                                 onPress={() => setEditName(true)}/>}
+                    />
+                    <List.Item
+                        title={user.positionshare ? 'Position shared' : 'Position not shared'}
+                        left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}
+                        right={() => <Switch value={user.positionshare} onValueChange={(value) => {
+                            viewModel.updateUser({...user, positionshare: value}).then(() => setUser({
+                                ...user,
+                                positionshare: value
+                            })).catch(error => console.error(error))
+                        }}/>}
+                    />
+                    <Divider/>
+                </ScrollView>
             }
-        </ScrollView>
+        </>
     )
 }
 
-function GenericDetail({icon, title, value, children, bottomDivider}) {
-    return (
-        <ListItem bottomDivider={bottomDivider}>
-            <Icon name={icon} color={COLORS.blue}/>
-            <ListItem.Content>
-                <ListItem.Title>{title}</ListItem.Title>
-            </ListItem.Content>
-            {
-                children === undefined ?
-                    <ListItem.Content right><ListItem.Title>{value}</ListItem.Title></ListItem.Content> : children
-            }
-        </ListItem>
-    )
-}
-
-function ListArtifacts({user, viewModel}) {
-    const [artifacts, setArtifacts] = useState([])
-    const [icons] = useState({weapon: 'hardware', armor: 'security', amulet: 'science'})
-
-    useEffect(() => {
-        viewModel.getArtifacts(user).then(result => {
-            setArtifacts(result)
-            console.log(`[ListArtifacts] ${JSON.stringify(artifacts)}`)
-        }).catch(error => console.error(`[ListArtifacts] ${error}`))
-    }, []);
+function EditName({visible, setVisible, user, setUser, vm}) {
+    const [newName, setNewName] = useState('')
 
     return (
-        <FlatList horizontal data={artifacts} keyExtractor={(item) => item.id} renderItem={({item}) =>
-            <Card>
-                <Card.Title>{item.name}</Card.Title>
-                <Card.Divider/>
-                <Avatar
-                    rounded
-                    containerStyle={globalStyles.avatar}
-                    size="medium"
-                    icon={{name: icons[item.type], type: 'material'}}
-                    source={{uri: `data:image/jpg;base64,${item.image}`}}
-                />
-                <GenericDetail title='Type' value={item.type}/>
-                <GenericDetail title='Level' value={item.level}/>
-            </Card>
-        }/>
-    )
+        <Portal>
+            <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+                <Dialog.Title>Edit name</Dialog.Title>
+                <Dialog.Content>
+                    <TextInput left={<TextInput.Icon icon='account-details'/>} label={user.name} placeholder="New name"
+                               onChangeText={(input) => setNewName(input)}/>
+                </Dialog.Content>
+                <Dialog.Actions>
+                    <Button onPress={() => setVisible(false)}>Cancel</Button>
+                    <Button onPress={() => {
+                        if (user.name !== newName && newName !== undefined) {
+                            vm.updateUser({...user, name: newName}).then(() => setUser({
+                                ...user,
+                                name: newName
+                            })).catch(error => console.error(error))
+                            setVisible(false)
+                        }
+                    }} disabled={newName.trim() === '' || newName.length >= 15}>Ok</Button>
+                </Dialog.Actions>
+            </Dialog>
+        </Portal>
+    );
 }
