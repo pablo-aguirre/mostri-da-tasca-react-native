@@ -1,7 +1,8 @@
-import {FlatList, ScrollView, View} from "react-native";
+import {FlatList} from "react-native";
 import React, {useEffect, useState} from "react";
 import RankingViewModel from "../viewmodels/RankingViewModel";
 import {ActivityIndicator, Appbar, Avatar, Dialog, Divider, IconButton, List, Portal, Text} from "react-native-paper";
+import {globalStyles} from "../../styles/global";
 
 export default function RankingScreen({sid}) {
     const [viewModel] = useState(new RankingViewModel(sid))
@@ -28,11 +29,9 @@ export default function RankingScreen({sid}) {
                     <Dialog visible={dialogVisible} onDismiss={hideDialog}>
                         <Dialog.Title style={{textAlign: 'center'}}>{selectedUser.name}</Dialog.Title>
                         <Dialog.Content>
-                            {selectedUser.picture ?
-                                <Avatar.Image size={150} style={{alignSelf: 'center'}}
-                                              source={{uri: `data:image/jpg;base64,${selectedUser.picture}`}}/> :
-                                <Avatar.Text size={150} style={{alignSelf: 'center'}}
-                                             label={selectedUser.name.charAt(0)}/>
+                            {(!selectedUser.picture || !/^[A-Za-z0-9+/]*={0,2}$/.test(selectedUser.picture)) ?
+                                <Avatar.Text label={selectedUser.name.charAt(0).toUpperCase()} style={globalStyles.avatar} size={150}/> :
+                                <Avatar.Image source={{uri: `data:image/png;base64,${selectedUser.picture}`}} style={globalStyles.avatar} size={150} />
                             }
                             <List.Item
                                 title={'Life points'}
@@ -59,9 +58,9 @@ export default function RankingScreen({sid}) {
                                 description={`${item.experience} XP`}
                                 style={{paddingHorizontal: 10}}
                                 left={() =>
-                                    item.picture ?
-                                        <Avatar.Image source={{uri: `data:image/jpg;base64,${item.picture}`}}/> :
-                                        <Avatar.Text label={item.name.charAt(0)}/>
+                                    (!item.picture || !/^[A-Za-z0-9+/]*={0,2}$/.test(item.picture)) ?
+                                        <Avatar.Text label={item.name.charAt(0).toUpperCase()} style={globalStyles.avatar}/> :
+                                        <Avatar.Image source={{uri: `data:image/png;base64,${item.picture}`}} style={globalStyles.avatar}/>
                                 }
                                 right={() =>
                                     <IconButton mode={"contained"} icon={"account-details"} onPress={() => {

@@ -16,8 +16,8 @@ export default function App() {
 
     const [index, setIndex] = useState(0)
     const [routes] = useState([
+        {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
         {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
-        {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'}
     ])
 
     const renderScene = BottomNavigation.SceneMap({
