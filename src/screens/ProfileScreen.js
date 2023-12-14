@@ -67,7 +67,7 @@ export default function ProfileScreen({session}) {
                                 onPress={() => updateImage()}/>
                     <List.Item
                         title='Name'
-                        left={() => <List.Icon icon='account-details'/>}
+                        left={() => <List.Icon icon='card-account-details'/>}
                         right={() => <IconButton icon='account-edit' mode={'contained'}
                                                  onPress={() => setEditName(true)}/>}
                     />
@@ -79,6 +79,17 @@ export default function ProfileScreen({session}) {
                                 .then(() => setUser({...user, positionshare: value}))
                                 .catch(error => console.error(`[ProfileScreen] ${error}`))
                         }}/>}
+                    />
+                    <Divider/>
+                    <List.Item
+                        title='Life points'
+                        left={() => <List.Icon icon={'heart'}/>}
+                        right={() => <List.Subheader>{user.life}</List.Subheader>}
+                    />
+                    <List.Item
+                        title='Experience'
+                        left={() => <List.Icon icon={'chart-bar'}/>}
+                        right={() => <List.Subheader>{user.experience}</List.Subheader>}
                     />
                     <Divider/>
                 </ScrollView>
