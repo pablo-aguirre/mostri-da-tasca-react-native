@@ -19,14 +19,10 @@ import {ScrollView} from "react-native";
 import {globalStyles} from "../../styles/global";
 
 
-/** TODO immagine del profilo
- *  - sistemare caricamento annullato (aperta Picker e premuto cancel)
- *  - controlli sull'immagine troppo grande
- */
+// TODO punti vita
+// TODO punti esperienza
+// TODO artefatti
 
-/** TODO artefatti
- *  - aggiungere uno header, se presenti artefatti
- */
 export default function ProfileScreen({session}) {
     const [viewModel] = useState(new ProfileViewModel(session))
     const [user, setUser] = useState(null)
