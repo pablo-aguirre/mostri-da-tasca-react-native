@@ -67,7 +67,7 @@ export default class StorageManager {
             'SELECT * FROM users WHERE uid = ?',
             [uid]
         )
-        console.log(`[selectUserFrom] ${JSON.stringify(result)}`)
+        // console.log(`[selectUserFrom] ${JSON.stringify(result)}`)
         return result
     }
 
