@@ -3,6 +3,7 @@ import AppViewModel from "./viewmodels/AppViewModel";
 import {BottomNavigation, PaperProvider} from "react-native-paper";
 import RankingScreen from "./screens/RankingScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import {Prova} from "./viewmodels/Prova";
 
 export default function App() {
     const [viewModel] = useState(new AppViewModel())
@@ -16,11 +17,13 @@ export default function App() {
 
     const [index, setIndex] = useState(0)
     const [routes] = useState([
+        {key: 'prova', title: 'Prova'},
         {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
         {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
     ])
 
     const renderScene = BottomNavigation.SceneMap({
+        prova: () => <Prova/>,
         ranking: () => <RankingScreen sid={session.sid}/>,
         profile: () => <ProfileScreen session={session}/>
     })
