@@ -3,6 +3,7 @@ import * as SQLite from "expo-sqlite";
 export default class StorageManager {
     constructor() {
         this.db = SQLite.openDatabase('users')
+        this.initDB()
     }
 
     async genericQuery(sql, args = []) {
