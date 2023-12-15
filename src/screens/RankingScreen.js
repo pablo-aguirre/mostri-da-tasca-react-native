@@ -19,8 +19,6 @@ export default function RankingScreen({sid}) {
             .catch(error => console.error(`[RankingScreen] ${error}`))
     }, []);
 
-
-    console.log(selectedUser);
     return (
         <>
             {selectedUser &&

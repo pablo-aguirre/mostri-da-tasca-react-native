@@ -10,7 +10,7 @@ export default class AppViewModel {
             sid = session.sid
             uid = session.uid
             await AsyncStorage.setItem('sid', sid)
-            await AsyncStorage.setItem('uid', uid)
+            await AsyncStorage.setItem('uid', uid.toString())
         }
         return {sid: sid, uid: uid}
     }

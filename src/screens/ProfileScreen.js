@@ -19,8 +19,7 @@ import {ScrollView} from "react-native";
 import {globalStyles} from "../../styles/global";
 
 
-// TODO punti vita
-// TODO punti esperienza
+// TODO salvataggio in locale delle informazioni (attualmente usa il server per salvarle e aggiornarle)
 // TODO artefatti
 
 export default function ProfileScreen({session}) {

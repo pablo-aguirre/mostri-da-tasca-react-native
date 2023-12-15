@@ -1,5 +1,4 @@
 import {StyleSheet} from "react-native";
-import {lightColors} from "@rneui/themed";
 
 export const globalStyles = StyleSheet.create({
     avatar: {alignSelf: 'center'},
