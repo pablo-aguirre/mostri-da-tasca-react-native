@@ -5,7 +5,7 @@ import {Appbar, Dialog, Divider, IconButton, List, Portal, Text} from "react-nat
 import {DB, SessionID} from "../Contexts";
 import UserAvatar from "../components/UserAvatar";
 
-const DialogContext = createContext()
+const RankingListContext = createContext()
 
 export default function RankingScreen() {
     const sid = useContext(SessionID)
@@ -16,17 +16,17 @@ export default function RankingScreen() {
     const [dialogVisible, setDialogVisible] = useState(false)
     const [selectedUser, setSelectedUser] = useState(undefined)
 
-    const updateRankingList = async ()  => {
+    const updateRankingList = async () => {
         console.log('[updateRankingList] updating rankingData...')
         setRankingData(await viewModel.getRanking())
     }
 
     useEffect(() => {
-        viewModel.getRanking().then(result => setRankingData(result))
-    }, []);
+        updateRankingList()
+    }, [])
 
     return (
-        <DialogContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
+        <RankingListContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Ranking List"/>
                 <Appbar.Action icon={'refresh'} onPress={() => updateRankingList()}/>
@@ -44,12 +44,12 @@ export default function RankingScreen() {
             />
 
             {selectedUser !== undefined && <DialogSelectedUser/>}
-        </DialogContext.Provider>
-    );
+        </RankingListContext.Provider>
+    )
 }
 
 function SingleRow({user}) {
-    const {setSelectedUser, setDialogVisible} = useContext(DialogContext)
+    const {setSelectedUser, setDialogVisible} = useContext(RankingListContext)
     return (
         <View>
             <List.Item
@@ -74,7 +74,7 @@ function SingleRow({user}) {
 }
 
 function DialogSelectedUser() {
-    const {dialogVisible, selectedUser, setDialogVisible, setSelectedUser} = useContext(DialogContext)
+    const {dialogVisible, selectedUser, setDialogVisible, setSelectedUser} = useContext(RankingListContext)
     return (
         <Portal>
             <Dialog
@@ -87,10 +87,12 @@ function DialogSelectedUser() {
                 <Dialog.Content>
                     <UserAvatar user={selectedUser} large/>
                     <List.Item
+                        left={() => <List.Icon icon={'heart'}/>}
                         title={'Life points'}
                         right={() => <Text>{selectedUser.life}</Text>}
                     />
                     <List.Item
+                        left={() => <List.Icon icon={'chart-bar'}/>}
                         title={'Experience'}
                         right={() => <Text>{selectedUser.experience}</Text>}
                     />
