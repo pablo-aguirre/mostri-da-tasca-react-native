@@ -14,6 +14,7 @@ export default class StorageManager {
 
     async initDB() {
         let queries = [
+            //'DROP TABLE users',
             `CREATE TABLE IF NOT EXISTS users (
                     uid INTEGER PRIMARY KEY,
                     profileversion INTEGER,
@@ -32,7 +33,7 @@ export default class StorageManager {
             'INSERT INTO users(uid, profileversion, name, picture) VALUES (?, ?, ?, ?)',
             [user.uid, user.profileversion, user.name, user.picture]
         )
-        console.log(`[insertUser] ${JSON.stringify(result)}`)
+        console.log(`[insertUser ${user.name}] ${JSON.stringify(result)}`)
         return result
     }
 

@@ -1,83 +1,97 @@
-import {FlatList} from "react-native";
-import React, {useEffect, useState} from "react";
+import {FlatList, View} from "react-native";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import RankingViewModel from "../viewmodels/RankingViewModel";
-import {ActivityIndicator, Appbar, Avatar, Dialog, Divider, IconButton, List, Portal, Text} from "react-native-paper";
-import {globalStyles} from "../../styles/global";
+import {Appbar, Dialog, Divider, IconButton, List, Portal, Text} from "react-native-paper";
+import {DB, SessionID} from "../Contexts";
+import UserAvatar from "../components/UserAvatar";
 
-export default function RankingScreen({sid}) {
-    const [viewModel] = useState(new RankingViewModel(sid))
+const DialogContext = createContext()
+
+export default function RankingScreen() {
+    const sid = useContext(SessionID)
+    const db = useContext(DB)
+    const viewModel = new RankingViewModel(sid, db)
+
     const [rankingData, setRankingData] = useState([])
     const [dialogVisible, setDialogVisible] = useState(false)
-    const [selectedUser, setSelectedUser] = useState()
-
-    const toggleDialog = () => setDialogVisible(!dialogVisible);
-
+    const [selectedUser, setSelectedUser] = useState(undefined)
 
     useEffect(() => {
-        viewModel.getRanking()
-            .then(result => setRankingData(result))
-            .catch(error => console.error(`[RankingScreen] ${error}`))
+        viewModel.getRanking().then(result => setRankingData(result))
     }, []);
 
-    return (
-        <>
-            {selectedUser &&
-                <Portal>
-                    <Dialog visible={dialogVisible} onDismiss={() => {
-                        toggleDialog()
-                        setSelectedUser(undefined)
-                    }}>
-                        <Dialog.Title style={{textAlign: 'center'}}>{selectedUser.name}</Dialog.Title>
-                        <Dialog.Content>
-                            {(!selectedUser.picture || !/^[A-Za-z0-9+/]*={0,2}$/.test(selectedUser.picture)) ?
-                                <Avatar.Text label={selectedUser.name.charAt(0).toUpperCase()}
-                                             style={globalStyles.avatar} size={150}/> :
-                                <Avatar.Image source={{uri: `data:image/png;base64,${selectedUser.picture}`}}
-                                              style={globalStyles.avatar} size={150}/>
-                            }
-                            <List.Item
-                                title={'Life points'}
-                                right={() => <Text>{selectedUser.life}</Text>}
-                            />
-                            <List.Item
-                                title={'Experience'}
-                                right={() => <Text>{selectedUser.experience}</Text>}
-                            />
-                        </Dialog.Content>
-                    </Dialog>
-                </Portal>
-            }
+    // TODO aggiungi bottone 'aggiorna' e crea funzione di update lista (da utilizzare anche nello useEffect)
 
+    return (
+        <DialogContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Ranking List"/>
             </Appbar.Header>
-            {rankingData.length === 0 ? <ActivityIndicator size='large' style={{alignSelf: 'center'}}/> :
-                <FlatList data={rankingData} renderItem={({item}) =>
-                    <>
-                        <List.Item
-                            title={item.name}
-                            description={`${item.experience} XP`}
-                            style={{paddingHorizontal: 10}}
-                            left={() =>
-                                (!item.picture || !/^[A-Za-z0-9+/]*={0,2}$/.test(item.picture)) ?
-                                    <Avatar.Text label={item.name.charAt(0).toUpperCase()}
-                                                 style={globalStyles.avatar}/> :
-                                    <Avatar.Image source={{uri: `data:image/png;base64,${item.picture}`}}
-                                                  style={globalStyles.avatar}/>
-                            }
-                            right={() =>
-                                <IconButton mode={"contained"} icon={"account-details"} onPress={() => {
-                                    setSelectedUser(item)
-                                    toggleDialog()
-                                }}/>
-                            }
-                        />
-                        <Divider/>
-                    </>
+
+            <FlatList
+                data={rankingData}
+                renderItem={({item}) =>
+                    <SingleRow
+                        user={item}
+                        setSelectedUser={setSelectedUser}
+                        setDialogVisible={setDialogVisible}
+                    />
                 }
-                />
-            }
-        </>
+            />
+
+            {selectedUser !== undefined && <DialogSelectedUser/>}
+        </DialogContext.Provider>
     );
 }
 
+function SingleRow({user}) {
+    const {setSelectedUser, setDialogVisible} = useContext(DialogContext)
+    return (
+        <View>
+            <List.Item
+                style={{paddingHorizontal: 10}}
+                title={user.name}
+                description={`${user.experience} XP`}
+                left={() => <UserAvatar user={user}/>}
+                right={() =>
+                    <IconButton
+                        mode={"contained"}
+                        icon={"account-details"}
+                        onPress={() => {
+                            setSelectedUser(user)
+                            setDialogVisible(true)
+                        }}
+                    />
+                }
+            />
+            <Divider/>
+        </View>
+    )
+}
+
+function DialogSelectedUser() {
+    const {dialogVisible, selectedUser, setDialogVisible, setSelectedUser} = useContext(DialogContext)
+    return (
+        <Portal>
+            <Dialog
+                visible={dialogVisible}
+                onDismiss={() => {
+                    setSelectedUser(undefined)
+                    setDialogVisible(false)
+                }}>
+                <Dialog.Title style={{textAlign: 'center'}}>{selectedUser.name}</Dialog.Title>
+                <Dialog.Content>
+                    <UserAvatar user={selectedUser} large/>
+                    <List.Item
+                        title={'Life points'}
+                        right={() => <Text>{selectedUser.life}</Text>}
+                    />
+                    <List.Item
+                        title={'Experience'}
+                        right={() => <Text>{selectedUser.experience}</Text>}
+                    />
+                </Dialog.Content>
+            </Dialog>
+        </Portal>
+    )
+}

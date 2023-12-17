@@ -2,21 +2,21 @@ import CommunicationController from "../models/CommunicationController"
 import StorageManager from "../models/StorageManager";
 
 export default class RankingViewModel {
-    constructor(sid) {
+    constructor(sid, db) {
         this.sid = sid
-        this.sm = new StorageManager()
+        this.db = db
     }
 
     async getRanking() {
         const rankingList = await CommunicationController.ranking(this.sid)
         let users = []
         for (const user of rankingList) {
-            let userFromDB = await this.sm.selectUserFrom(user.uid)
+            let userFromDB = await this.db.selectUserFrom(user.uid)
             if (userFromDB.length === 0 || userFromDB[0].profileversion !== user.profileversion) {
                 let userFromServer = await CommunicationController.userInformation(this.sid, user.uid)
-                await this.sm.insertUser(userFromServer)
+                await this.db.insertUser(userFromServer)
             }
-            userFromDB = await this.sm.selectUserFrom(user.uid)
+            userFromDB = await this.db.selectUserFrom(user.uid)
             users.push({...userFromDB[0], life: user.life, experience: user.experience})
         }
         return users

@@ -1,42 +1,53 @@
 import {useEffect, useState} from "react";
-import AppViewModel from "./viewmodels/AppViewModel";
 import {BottomNavigation, PaperProvider} from "react-native-paper";
 import RankingScreen from "./screens/RankingScreen";
-import ProfileScreen from "./screens/ProfileScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CommunicationController from "./models/CommunicationController";
+import {DB, SessionID} from "./Contexts";
+import StorageManager from "./models/StorageManager";
 
 export default function App() {
-    const [viewModel] = useState(new AppViewModel())
     const [sid, setSid] = useState(null)
-    const [uid, setUid] = useState(null)
 
     useEffect(() => {
-        viewModel.getSession().then(result => {
-                setSid(result.sid)
-                setUid(result.uid)
-            }
-        )
+        getSessionID().then(result => setSid(result))
     }, []);
 
     const [index, setIndex] = useState(0)
     const [routes] = useState([
         {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
-        {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
+        //{key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
     ])
 
     const renderScene = BottomNavigation.SceneMap({
-        ranking: () => <RankingScreen sid={sid}/>,
-        profile: () => <ProfileScreen session={{sid: sid, uid: uid}}/>
+        ranking: () => <RankingScreen/>,
+        //profile: () => <ProfileScreen session={{sid: sid, uid: uid}}/>
     })
 
     return (
-        <PaperProvider>
-            {sid &&
-                <BottomNavigation
-                    navigationState={{index, routes}}
-                    onIndexChange={setIndex}
-                    renderScene={renderScene}
-                />
-            }
-        </PaperProvider>
-    );
+        sid &&
+        <SessionID.Provider value={sid}>
+            <DB.Provider value={new StorageManager()}>
+                <PaperProvider>
+                    <BottomNavigation
+                        navigationState={{index, routes}}
+                        onIndexChange={setIndex}
+                        renderScene={renderScene}
+                    />
+                </PaperProvider>
+            </DB.Provider>
+        </SessionID.Provider>
+    )
+}
+
+async function getSessionID() {
+    let sid = await AsyncStorage.getItem('sid')
+    if (sid === null) {
+        const session = await CommunicationController.newSession()
+        sid = session.sid
+        await AsyncStorage.setItem('sid', session.sid)
+        await AsyncStorage.setItem('uid', session.uid.toString())
+    }
+    console.log(`[getSessionID] sid: ${sid}`)
+    return sid
 }
