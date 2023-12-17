@@ -24,7 +24,7 @@ export default function RankingScreen() {
     useEffect(() => {
         viewModel.getRanking().then(result => setRankingData(result))
     }, []);
-    
+
     return (
         <DialogContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
             <Appbar.Header mode='small' elevated>

@@ -4,7 +4,7 @@ export default class CommunicationController {
     static async genericRequest(endpoint, verb, queryParams = {}, bodyParams = {}) {
         const queryParamsFormatted = new URLSearchParams(queryParams).toString()
         const url = `${this.BASE_URL}${endpoint}${!queryParamsFormatted ? '' : '?' + queryParamsFormatted}`
-        console.log(`[CommunicationController] Request ${verb} to ${url} ...`);
+        //console.log(`[CommunicationController] Request ${verb} to ${url} ...`);
 
         let fetchData = {method: verb, headers: {Accept: 'application/json', 'Content-Type': 'application/json'}}
 

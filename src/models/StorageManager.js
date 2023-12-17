@@ -37,22 +37,12 @@ export default class StorageManager {
         return result
     }
 
-    async updateUserName(uid, profileVersion, name) {
+    async updateUser(user) {
         let result = await this.genericQuery(
-            'UPDATE users SET name = ?, profileversion = ? WHERE uid = ?',
-            [name, profileVersion, uid]
+            'UPDATE users SET profileversion = ?, name = ?, picture = ? WHERE uid = ?',
+            [user.profileversion, user.name, user.picture, user.uid]
         )
-        console.log(`[updateUserName] ${JSON.stringify(result)}`)
-        return result
-    }
-
-    async updateUserPicture(uid, profileVersion, picture) {
-        let result = await this.genericQuery(
-            'UPDATE users SET picture = ?, profileversion = ? WHERE uid = ?',
-            [picture, profileVersion, uid]
-        )
-        console.log(`[updateUserPicture] ${JSON.stringify(result)}`)
-        return result
+        console.log(`[updateUser ${user.name}]`)
     }
 
     async selectAllUsers() {
