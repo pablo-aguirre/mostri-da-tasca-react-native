@@ -16,16 +16,20 @@ export default function RankingScreen() {
     const [dialogVisible, setDialogVisible] = useState(false)
     const [selectedUser, setSelectedUser] = useState(undefined)
 
+    const updateRankingList = async ()  => {
+        console.log('[updateRankingList] updating rankingData...')
+        setRankingData(await viewModel.getRanking())
+    }
+
     useEffect(() => {
         viewModel.getRanking().then(result => setRankingData(result))
     }, []);
-
-    // TODO aggiungi bottone 'aggiorna' e crea funzione di update lista (da utilizzare anche nello useEffect)
-
+    
     return (
         <DialogContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Ranking List"/>
+                <Appbar.Action icon={'refresh'} onPress={() => updateRankingList()}/>
             </Appbar.Header>
 
             <FlatList
