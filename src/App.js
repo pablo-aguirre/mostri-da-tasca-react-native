@@ -6,6 +6,7 @@ import CommunicationController from "./models/CommunicationController";
 import {DB, SessionID} from "./Contexts";
 import StorageManager from "./models/StorageManager";
 import ProfileScreen from "./screens/ProfileScreen";
+import {MapScreen} from "./screens/MapScreen";
 
 export default function App() {
     const [sid, setSid] = useState(null)
@@ -16,11 +17,13 @@ export default function App() {
 
     const [index, setIndex] = useState(0)
     const [routes] = useState([
+        {key: 'map', title: 'Map', focusedIcon: 'map', unfocusedIcon: 'map-outline'},
         {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
         {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
     ])
 
     const renderScene = BottomNavigation.SceneMap({
+        map: () => <MapScreen/>,
         profile: () => <ProfileScreen/>,
         ranking: () => <RankingScreen/>,
     })
