@@ -1,17 +1,19 @@
 import CommunicationController from "../models/CommunicationController";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class ProfileViewModel {
-    constructor(session) {
-        this.sid = session.sid
-        this.uid = session.uid
+    constructor(sid) {
+        this.sid = sid
     }
 
     async getUser() {
-        return CommunicationController.userInformation(this.sid, this.uid)
+        const uid = parseInt(await AsyncStorage.getItem('uid'))
+        return CommunicationController.userInformation(this.sid, uid)
     }
 
     async updateUser(user) {
-        await CommunicationController.updateUser(this.sid, this.uid, user.name, user.positionshare, user.picture)
+        const uid = parseInt(await AsyncStorage.getItem('uid'))
+        await CommunicationController.updateUser(this.sid, uid, user.name, user.positionshare, user.picture)
     }
 
     async getArtifacts(user) {

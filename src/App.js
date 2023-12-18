@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CommunicationController from "./models/CommunicationController";
 import {DB, SessionID} from "./Contexts";
 import StorageManager from "./models/StorageManager";
+import ProfileScreen from "./screens/ProfileScreen";
 
 export default function App() {
     const [sid, setSid] = useState(null)
@@ -15,13 +16,13 @@ export default function App() {
 
     const [index, setIndex] = useState(0)
     const [routes] = useState([
+        {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
         {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
-        //{key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
     ])
 
     const renderScene = BottomNavigation.SceneMap({
+        profile: () => <ProfileScreen/>,
         ranking: () => <RankingScreen/>,
-        //profile: () => <ProfileScreen session={{sid: sid, uid: uid}}/>
     })
 
     return (
