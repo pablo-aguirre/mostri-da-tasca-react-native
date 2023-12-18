@@ -1,64 +1,44 @@
-import {Button} from "react-native-paper";
-import {SafeAreaView} from "react-native";
-import {useState} from "react";
-import CommunicationController from "../models/CommunicationController";
+import React, {useEffect, useState} from "react";
 
 import * as Location from 'expo-location';
-import MapView, {Marker} from 'react-native-maps'
+import MapView from 'react-native-maps'
+import {Appbar} from "react-native-paper";
 
 export function MapScreen() {
-    const [coords, setCoords] = useState()
-    const [data, setData] = useState([])
+    const [location, setLocation] = useState()
+    const [region, setRegion] = useState()
 
-    const updateData = async () => {
-        setData(await CommunicationController.nearbyUsers('vKFPFt1XC0L0i1fzV7eY', coords.lat, coords.lon))
-        data.map((value) => console.log(value))
-    }
-
-    const locationPermissionAsync = async () => {
-        let canUseLocation = false
-        const grantedPermission = await Location.getForegroundPermissionsAsync()
-        if (grantedPermission.status === "granted") {
-            canUseLocation = true
-        } else {
-            const permissionResponse = await Location.requestForegroundPermissionsAsync()
-            if (permissionResponse.status === "granted") {
-                canUseLocation = true
+    useEffect(() => {
+        Location.requestForegroundPermissionsAsync()
+            .then(result => console.log(`[MapScreen] permissions: ${JSON.stringify(result)}`))
+        Location.watchPositionAsync(
+            {
+                accuracy: Location.Accuracy.High,
+                distanceInterval: 1
+            },
+            (newLocation) => {
+                console.log(`[MapScreen] new location: ${JSON.stringify(newLocation)}`)
+                setLocation(newLocation.coords)
             }
-        }
-        console.log(canUseLocation ? 'Ho i permessi' : 'Non ho i permessi')
-    }
+        )
+    }, []);
 
-    const currentPosition = async () => {
-        const location = await Location.getCurrentPositionAsync()
-        setCoords({
-            lat: location.coords.latitude,
-            lon: location.coords.longitude,
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude
-        })
-        console.log(coords)
-    }
+    useEffect(() => {
+        setRegion({...location, latitudeDelta: 0.005, longitudeDelta: 0.005})
+    }, [location]);
 
+    console.log(location);
+    console.log(region);
     return (
-        <SafeAreaView>
-            <Button onPress={() => updateData()}>
-                Users near me
-            </Button>
-            <Button onPress={() => locationPermissionAsync()}>
-                Get Permissions
-            </Button>
-            <Button onPress={() => currentPosition()}>
-                Update Position
-            </Button>
+        <>
+            <Appbar.Header mode='small' elevated>
+                <Appbar.Content title="Map"/>
+            </Appbar.Header>
             <MapView
                 showsUserLocation
-                style={{width:'100%', height:'100%'}}
-            >
-                {data.map((user) =>
-                    <Marker key={user.uid} coordinate={{latitude:user.lat, longitude: user.lon}}/>
-                )}
-            </MapView>
-        </SafeAreaView>
+                region={region}
+                style={{width: '100%', height: '86%'}}
+            />
+        </>
     )
 }
