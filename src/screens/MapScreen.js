@@ -1,73 +1,51 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {Appbar, Icon} from "react-native-paper";
-import * as Location from 'expo-location';
 import MapView, {Marker} from "react-native-maps";
 import CommunicationController from "../models/CommunicationController";
-import {SessionID} from "../Contexts";
+import {DB, SessionID} from "../Contexts";
 
 import {iconsObjects} from "../components/MyAvatar";
 import MyDialog from "../components/MyDialog";
+import {MapScreenViewModel} from "../viewmodels/MapScreenViewModel";
 
 const MapContext = createContext()
 
 export function MapScreen() {
-    const [currentLocation, setCurrentLocation] = useState()
     const [dialogVisible, setDialogVisible] = useState(false)
-    const [selectedObject, setSelectedObject] = useState(null)
+    const [selected, setSelected] = useState(null)
 
-    useEffect(() => {
-        const periodicPosition = async () => {
-            let {status} = await Location.requestForegroundPermissionsAsync()
-            if (status === 'granted')
-                Location.watchPositionAsync(
-                    {
-                        accuracy: Location.Accuracy.Balanced,
-                        distanceInterval: 10
-                    },
-                    (newLocation) => {
-                        setCurrentLocation({
-                            lat: newLocation.coords.latitude,
-                            lon: newLocation.coords.longitude
-                        })
-                    }
-                )
-        }
-        periodicPosition()
-    }, []);
-
-    return (currentLocation &&
+    return (
         <MapContext.Provider
-            value={{currentLocation, dialogVisible, setDialogVisible, selectedObject, setSelectedObject}}>
+            value={{dialogVisible, setDialogVisible, selected, setSelected}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Map"/>
             </Appbar.Header>
             <MyMap/>
-            {selectedObject &&
-                <MyDialog data={selectedObject} isVisible={dialogVisible} setIsVisible={setDialogVisible} object/>}
+            {selected && <MyDialog data={selected} isVisible={dialogVisible} setIsVisible={setDialogVisible} object/>}
         </MapContext.Provider>
     )
 }
 
 function MyMap() {
-    const {currentLocation} = useContext(MapContext)
     const sid = useContext(SessionID)
+    const db = useContext(DB)
+    const viewModel = new MapScreenViewModel(sid, db)
+
+    const [currentLocation, setCurrentLocation] = useState({lat: 0, lon: 0})
     const [region, setRegion] = useState({
         latitude: currentLocation.lat,
         longitude: currentLocation.lon,
-        latitudeDelta: 0.0004,
-        longitudeDelta: 0.0004
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001
     })
+
     const [objects, setObjects] = useState([])
 
     useEffect(() => {
-        setRegion({
-            ...region,
-            latitude: currentLocation.lat,
-            longitude: currentLocation.lon
-        })
-        CommunicationController.nearbyObjects(sid, currentLocation.lat, currentLocation.lon)
-            .then((result) => setObjects(result))
-    }, [currentLocation])
+        setRegion({...region, latitude: currentLocation.lat, longitude: currentLocation.lon})
+        viewModel.getObjects(currentLocation.lat, currentLocation.lon)
+            .then(value => setObjects(value))
+    }, [currentLocation]);
 
     return (
         <MapView
@@ -79,33 +57,28 @@ function MyMap() {
             showsMyLocationButton={true}
             region={region}
             onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
+            onUserLocationChange={(event) => setCurrentLocation({
+                lat: event.nativeEvent.coordinate.latitude,
+                lon: event.nativeEvent.coordinate.longitude
+            })}
         >
-            {objects.map((object) => <MyMarker virtualObject={object}/>)}
+            {objects.map((object) => <MyMarker key={object.id} object={object}/>)}
         </MapView>
     )
 }
 
-function MyMarker({virtualObject}) {
-    const sid = useContext(SessionID)
-    const {setDialogVisible, setSelectedObject} = useContext(MapContext)
+function MyMarker({object}) {
+    const {setDialogVisible, setSelected} = useContext(MapContext)
 
-    const [details, setDetails] = useState()
-
-    useEffect(() => {
-        CommunicationController.objectInformation(sid, virtualObject.id)
-            .then(result => setDetails(result))
-    }, []);
-
-    return (details &&
+    return (
         <Marker
-            key={details.id}
-            coordinate={{latitude: details.lat, longitude: details.lon}}
+            coordinate={{latitude: object.lat, longitude: object.lon}}
             onPress={() => {
-                setSelectedObject(details)
+                setSelected(object)
                 setDialogVisible(true)
             }}
         >
-            <Icon size={40} source={iconsObjects[details.type]}/>
+            <Icon size={40} source={iconsObjects[object.type]}/>
         </Marker>
     )
 }

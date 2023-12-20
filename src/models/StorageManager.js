@@ -20,6 +20,7 @@ export default class StorageManager {
     async initDB() {
         let queries = [
             //'DROP TABLE users',
+            //'DROP TABLE objects',
             `CREATE TABLE IF NOT EXISTS users (
                     uid INTEGER PRIMARY KEY,
                     profileversion INTEGER,
