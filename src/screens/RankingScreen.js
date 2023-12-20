@@ -3,7 +3,7 @@ import React, {createContext, useContext, useEffect, useState} from "react";
 import RankingViewModel from "../viewmodels/RankingViewModel";
 import {Appbar, Dialog, Divider, IconButton, List, Portal, Text} from "react-native-paper";
 import {DB, SessionID} from "../Contexts";
-import UserAvatar from "../components/UserAvatar";
+import {UserAvatar} from "../components/MyAvatar";
 
 const RankingListContext = createContext()
 

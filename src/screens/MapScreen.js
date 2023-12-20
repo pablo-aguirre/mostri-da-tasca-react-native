@@ -4,7 +4,8 @@ import * as Location from 'expo-location';
 import MapView, {Marker} from "react-native-maps";
 import CommunicationController from "../models/CommunicationController";
 import {SessionID} from "../Contexts";
-import {iconsObjects, ObjectAvatar} from "../components/ObjectAvatar";
+
+import {iconsObjects, ObjectAvatar} from "../components/MyAvatar";
 
 const MapContext = createContext()
 

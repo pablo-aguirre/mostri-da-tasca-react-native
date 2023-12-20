@@ -8,7 +8,12 @@ export default class StorageManager {
 
     async genericQuery(sql, args = []) {
         let query = {args: args, sql: sql}
-        let result = await this.db.execAsync([query], false).catch(error => `[genericQuery] ${error}`)
+        let result
+        try {
+            result = await this.db.execAsync([query], false)
+        } catch (e) {
+            console.error(`[genericQuery: ${query.sql}] ${e}`)
+        }
         return result[0].rows
     }
 
@@ -20,46 +25,51 @@ export default class StorageManager {
                     profileversion INTEGER,
                     name TEXT,
                     picture TEXT
-                )`
+                    )`,
+            `CREATE TABLE IF NOT EXISTS objects (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    type TEXT,
+                    level INTEGER,
+                    image TEXT
+                    )`
         ]
-        for (let query of queries) {
-            let result = await this.genericQuery(query)
-            console.log(`[initDB] ${JSON.stringify(result)}`)
-        }
+        for (let query of queries)
+            await this.genericQuery(query)
     }
 
     async insertUser(user) {
-        let result = await this.genericQuery(
+        await this.genericQuery(
             'INSERT INTO users(uid, profileversion, name, picture) VALUES (?, ?, ?, ?)',
             [user.uid, user.profileversion, user.name, user.picture]
         )
-        console.log(`[insertUser ${user.name}] ${JSON.stringify(result)}`)
-        return result
     }
 
     async updateUser(user) {
-        let result = await this.genericQuery(
+        await this.genericQuery(
             'UPDATE users SET profileversion = ?, name = ?, picture = ? WHERE uid = ?',
             [user.profileversion, user.name, user.picture, user.uid]
         )
-        console.log(`[updateUser ${user.name}]`)
-    }
-
-    async selectAllUsers() {
-        let result = await this.genericQuery(
-            'SELECT * FROM users'
-        )
-        console.log(`[selectAllUsers] ${JSON.stringify(result)}`)
-        return result
     }
 
     async selectUserFrom(uid) {
-        let result = await this.genericQuery(
+        return await this.genericQuery(
             'SELECT * FROM users WHERE uid = ?',
             [uid]
         )
-        // console.log(`[selectUserFrom] ${JSON.stringify(result)}`)
-        return result
     }
 
+    async insertObject(object) {
+        return await this.genericQuery(
+            'INSERT INTO objects(id, name, type, level, image) VALUES (?, ?, ?, ?, ?)',
+            [object.id, object.name, object.type, object.level, object.image]
+        )
+    }
+
+    async selectObjectFrom(id) {
+        return await this.genericQuery(
+            'SELECT * FROM objects WHERE id = ?',
+            [id]
+        )
+    }
 }
