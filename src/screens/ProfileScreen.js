@@ -5,7 +5,7 @@ import {Appbar, Button, Dialog, IconButton, List, Portal, Text, TextInput} from 
 import {ScrollView} from "react-native";
 import {globalStyles} from "../../styles/global";
 import {SessionID} from "../Contexts";
-import UserAvatar from "../components/UserAvatar";
+import {UserAvatar} from "../components/MyAvatar";
 
 // TODO salvataggio in locale delle informazioni (attualmente usa il server per salvarle e aggiornarle)
 // TODO artefatti
