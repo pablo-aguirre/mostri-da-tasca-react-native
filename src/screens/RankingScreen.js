@@ -1,9 +1,10 @@
 import {FlatList, View} from "react-native";
 import React, {createContext, useContext, useEffect, useState} from "react";
 import RankingViewModel from "../viewmodels/RankingViewModel";
-import {Appbar, Dialog, Divider, IconButton, List, Portal, Text} from "react-native-paper";
+import {Appbar, Divider, IconButton, List} from "react-native-paper";
 import {DB, SessionID} from "../Contexts";
 import {UserAvatar} from "../components/MyAvatar";
+import MyDialog from "../components/MyDialog";
 
 const RankingListContext = createContext()
 
@@ -26,7 +27,7 @@ export default function RankingScreen() {
     }, [])
 
     return (
-        <RankingListContext.Provider value={{setDialogVisible, setSelectedUser, dialogVisible, selectedUser}}>
+        <RankingListContext.Provider value={{setDialogVisible, setSelectedUser}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Ranking List"/>
                 <Appbar.Action icon={'refresh'} onPress={() => updateRankingList()}/>
@@ -43,7 +44,8 @@ export default function RankingScreen() {
                 }
             />
 
-            {selectedUser !== undefined && <DialogSelectedUser/>}
+            {selectedUser !== undefined &&
+                <MyDialog data={selectedUser} setIsVisible={setDialogVisible} isVisible={dialogVisible}/>}
         </RankingListContext.Provider>
     )
 }
@@ -70,34 +72,5 @@ function SingleRow({user}) {
             />
             <Divider/>
         </View>
-    )
-}
-
-function DialogSelectedUser() {
-    const {dialogVisible, selectedUser, setDialogVisible, setSelectedUser} = useContext(RankingListContext)
-    return (
-        <Portal>
-            <Dialog
-                visible={dialogVisible}
-                onDismiss={() => {
-                    setSelectedUser(undefined)
-                    setDialogVisible(false)
-                }}>
-                <Dialog.Title style={{textAlign: 'center'}}>{selectedUser.name}</Dialog.Title>
-                <Dialog.Content>
-                    <UserAvatar user={selectedUser} large/>
-                    <List.Item
-                        left={() => <List.Icon icon={'heart'}/>}
-                        title={'Life points'}
-                        right={() => <Text>{selectedUser.life}</Text>}
-                    />
-                    <List.Item
-                        left={() => <List.Icon icon={'chart-bar'}/>}
-                        title={'Experience'}
-                        right={() => <Text>{selectedUser.experience}</Text>}
-                    />
-                </Dialog.Content>
-            </Dialog>
-        </Portal>
     )
 }
