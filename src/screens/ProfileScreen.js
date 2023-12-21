@@ -1,31 +1,42 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import * as ImagePicker from "expo-image-picker";
-import {Appbar, Button, Dialog, IconButton, List, Portal, Text, TextInput} from "react-native-paper";
-import {ScrollView} from "react-native";
-import {globalStyles} from "../../styles/global";
-import {SessionID} from "../Contexts";
-import {UserAvatar} from "../components/MyAvatar";
-
-// TODO salvataggio in locale delle informazioni (attualmente usa il server per salvarle e aggiornarle)
-// TODO artefatti
+import {
+    Appbar,
+    Button,
+    Card,
+    Dialog,
+    Divider,
+    IconButton,
+    List,
+    Portal,
+    Switch,
+    Text,
+    TextInput
+} from "react-native-paper";
+import {FlatList, ScrollView} from "react-native";
+import {DB, SessionID} from "../Contexts";
+import {iconsObjects, ObjectAvatar, UserAvatar} from "../components/MyAvatar";
 
 const ProfileContext = createContext()
 
 export default function ProfileScreen() {
     const sid = useContext(SessionID)
-    const viewModel = new ProfileViewModel(sid)
+    const db = useContext(DB)
+    const viewModel = new ProfileViewModel(sid, db)
 
     const [user, setUser] = useState(null)
-    const [editNameDialogVisible, setEditNameDialogVisible] = useState(false)
-
-    const getUser = async () => {
-        setUser(await viewModel.getUser())
-    }
+    const [editNameVisible, setEditNameVisible] = useState(false)
 
     useEffect(() => {
-        getUser()
+        viewModel.getUser()
+            .then(value => setUser(value))
     }, [])
+
+    useEffect(() => {
+        if (user)
+            viewModel.updateUser(user)
+    }, [user]);
 
     const updateImage = async () => {
         let image = await ImagePicker.launchImageLibraryAsync({
@@ -33,66 +44,101 @@ export default function ProfileScreen() {
             base64: true,
             quality: 0
         })
-        if (!image.canceled) {
-            await viewModel.updateUser({...user, picture: image.assets[0].base64})
+        if (!image.canceled)
             setUser({...user, picture: image.assets[0].base64})
-        }
     }
 
     return (
-        <ProfileContext.Provider value={{user, setUser, editNameDialogVisible, setEditNameDialogVisible}}>
+        <ProfileContext.Provider value={{viewModel, user, setUser, editNameVisible, setEditNameVisible}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Profile"/>
             </Appbar.Header>
             {user &&
-                <ScrollView style={globalStyles.screen}>
+                <ScrollView>
                     <Text variant='headlineMedium' style={{alignSelf: 'center'}}>{user.name}</Text>
                     <UserAvatar user={user} large/>
                     <IconButton
                         size={15}
-                        icon='camera'
+                        icon='image-edit'
                         style={{alignSelf: 'center'}}
                         onPress={() => updateImage()}/>
                     <List.Item
+                        style={{paddingHorizontal: 10}}
                         title='Name'
                         left={() => <List.Icon icon='card-account-details'/>}
                         right={() =>
                             <IconButton
                                 icon='account-edit'
                                 mode={'contained'}
-                                onPress={() => setEditNameDialogVisible(true)}
+                                onPress={() => setEditNameVisible(true)}
                             />
                         }
                     />
-                    {/*<List.Item*/}
-                    {/*    title={user.positionshare ? 'Position shared' : 'Position not shared'}*/}
-                    {/*    left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}*/}
-                    {/*    right={() => <Switch value={user.positionshare} onValueChange={(value) => {*/}
-                    {/*        viewModel.updateUser({...user, positionshare: value})*/}
-                    {/*            .then(() => setUser({...user, positionshare: value}))*/}
-                    {/*            .catch(error => console.error(`[ProfileScreen] ${error}`))*/}
-                    {/*    }}/>}*/}
-                    {/*/>*/}
-                    {/*<Divider/>*/}
-                    {/*<List.Item*/}
-                    {/*    title='Life points'*/}
-                    {/*    left={() => <List.Icon icon={'heart'}/>}*/}
-                    {/*    right={() => <List.Subheader>{user.life}</List.Subheader>}*/}
-                    {/*/>*/}
-                    {/*<List.Item*/}
-                    {/*    title='Experience'*/}
-                    {/*    left={() => <List.Icon icon={'chart-bar'}/>}*/}
-                    {/*    right={() => <List.Subheader>{user.experience}</List.Subheader>}*/}
-                    {/*/>*/}
-                    {/*<Divider/>*/}
+                    <List.Item
+                        style={{paddingHorizontal: 10}}
+                        title={user.positionshare ? 'Position shared' : 'Position not shared'}
+                        left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}
+                        right={() => <Switch value={user.positionshare}
+                                             onValueChange={(value) => setUser({...user, positionshare: value})}/>}
+                    />
+                    <Divider/>
+                    <List.Item
+                        style={{paddingHorizontal: 10}}
+                        title='Life points'
+                        left={() => <List.Icon icon={'heart'}/>}
+                        right={() => <List.Subheader>{user.life}</List.Subheader>}
+                    />
+                    <List.Item
+                        style={{paddingHorizontal: 10}}
+                        title='Experience'
+                        left={() => <List.Icon icon={'chart-bar'}/>}
+                        right={() => <List.Subheader>{user.experience}</List.Subheader>}
+                    />
+                    <Divider/>
+                    <MyArtifacts/>
+                    <EditName/>
                 </ScrollView>
             }
+
         </ProfileContext.Provider>
     )
 }
 
+function MyArtifacts() {
+    const {viewModel, user} = useContext(ProfileContext)
+
+    const [artifacts, setArtifacts] = useState([])
+    useEffect(() => {
+        viewModel.getArtifacts(user)
+            .then(value => setArtifacts(value))
+    }, []);
+
+
+    return (
+        <FlatList horizontal showsVerticalScrollIndicator={false} data={artifacts} renderItem={({item}) => {
+            return (
+                <Card>
+                    <Card.Title title={item.name}/>
+                    <Card.Content>
+                        <ObjectAvatar object={item} large/>
+                        <List.Item
+                            title={'type'}
+                            right={() => <Text>{item.type}</Text>}
+                        />
+                        <List.Item
+                            title={'level'}
+                            right={() => <Text>{item.level}</Text>}
+                        />
+                    </Card.Content>
+                </Card>
+            )
+        }
+        }/>
+    )
+}
+
 function EditName() {
-    const {user, setUser, editNameDialogVisible, setEditNameDialogVisible} = useContext(ProfileContext)
+    const {user, setUser, editNameVisible, setEditNameVisible} = useContext(ProfileContext)
     const [newName, setNewName] = useState('')
 
     function isValid(name) {
@@ -101,22 +147,24 @@ function EditName() {
 
     return (
         <Portal>
-            <Dialog visible={editNameDialogVisible} onDismiss={() => setEditNameDialogVisible(false)}>
+            <Dialog visible={editNameVisible} onDismiss={() => setEditNameVisible(false)}>
                 <Dialog.Title>Edit name</Dialog.Title>
                 <Dialog.Content>
                     <TextInput
-                        left={<TextInput.Icon icon='account-details'/>}
+                        left={<TextInput.Icon icon='card-account-details'/>}
                         label={user.name}
-                        placeholder="New name"
                         onChangeText={(input) => setNewName(input)}
                     />
                 </Dialog.Content>
                 <Dialog.Actions>
-                    <Button onPress={() => setEditNameDialogVisible(false)}>Cancel</Button>
+                    <Button onPress={() => setEditNameVisible(false)}>Cancel</Button>
                     <Button
-                        onPress={() => setUser({...user, name: newName})}
+                        onPress={() => {
+                            setUser({...user, name: newName})
+                            setEditNameVisible(false)
+                        }}
                         disabled={!isValid(newName)}>
-                        Ok
+                        Confirm
                     </Button>
                 </Dialog.Actions>
             </Dialog>

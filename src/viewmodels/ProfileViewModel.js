@@ -2,8 +2,9 @@ import CommunicationController from "../models/CommunicationController";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class ProfileViewModel {
-    constructor(sid) {
+    constructor(sid, db) {
         this.sid = sid
+        this.db = db
     }
 
     async getUser() {
@@ -19,8 +20,10 @@ export default class ProfileViewModel {
     async getArtifacts(user) {
         let artifacts = []
         for (let artifact of ['weapon', 'armor', 'amulet'])
-            if (user[artifact])
-                artifacts.push(await CommunicationController.objectInformation(this.sid, user[artifact]))
+            if (user[artifact]) {
+                const artifactFromDB = await this.db.selectObjectFrom(user[artifact])
+                artifacts.push(artifactFromDB[0])
+            }
         return artifacts
     }
 }
