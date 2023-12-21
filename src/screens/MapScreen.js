@@ -1,7 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {Appbar, Icon} from "react-native-paper";
 import MapView, {Marker} from "react-native-maps";
-import CommunicationController from "../models/CommunicationController";
 import {DB, SessionID} from "../Contexts";
 
 import {iconsObjects} from "../components/MyAvatar";
@@ -21,7 +20,8 @@ export function MapScreen() {
                 <Appbar.Content title="Map"/>
             </Appbar.Header>
             <MyMap/>
-            {selected && <MyDialog data={selected} isVisible={dialogVisible} setIsVisible={setDialogVisible} object/>}
+            {selected && <MyDialog data={selected} isVisible={dialogVisible} setIsVisible={setDialogVisible}
+                                   object={selected.type}/>}
         </MapContext.Provider>
     )
 }
@@ -40,21 +40,25 @@ function MyMap() {
     })
 
     const [objects, setObjects] = useState([])
+    const [users, setUsers] = useState([])
 
     useEffect(() => {
         setRegion({...region, latitude: currentLocation.lat, longitude: currentLocation.lon})
-        viewModel.getObjects(currentLocation.lat, currentLocation.lon)
-            .then(value => setObjects(value))
+        if (currentLocation.lat !== 0) {
+            viewModel.getObjects(currentLocation.lat, currentLocation.lon)
+                .then(value => setObjects(value))
+            viewModel.getUsers(currentLocation.lat, currentLocation.lon)
+                .then(value => setUsers(value))
+        }
     }, [currentLocation]);
 
     return (
         <MapView
-            style={{width: '100%', height: '86%'}}
+            style={{flex: 1}}
             provider={"google"}
             showsUserLocation
-            //scrollEnabled={false}
-            //minZoomLevel={15}
-            showsMyLocationButton={true}
+            scrollEnabled={false}
+            minZoomLevel={15}
             region={region}
             onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
             onUserLocationChange={(event) => setCurrentLocation({
@@ -62,23 +66,24 @@ function MyMap() {
                 lon: event.nativeEvent.coordinate.longitude
             })}
         >
-            {objects.map((object) => <MyMarker key={object.id} object={object}/>)}
+            {objects.map((object) => <MyMarker key={object.id} item={object}/>)}
+            {users.map((user) => <MyMarker key={user.uid} item={user}/>)}
         </MapView>
     )
 }
 
-function MyMarker({object}) {
+function MyMarker({item}) {
     const {setDialogVisible, setSelected} = useContext(MapContext)
 
     return (
         <Marker
-            coordinate={{latitude: object.lat, longitude: object.lon}}
+            coordinate={{latitude: item.lat, longitude: item.lon}}
             onPress={() => {
-                setSelected(object)
+                setSelected(item)
                 setDialogVisible(true)
             }}
         >
-            <Icon size={40} source={iconsObjects[object.type]}/>
+            <Icon size={40} source={item.type ? iconsObjects[item.type] : 'account'}/>
         </Marker>
     )
 }

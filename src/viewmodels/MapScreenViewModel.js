@@ -21,4 +21,23 @@ export class MapScreenViewModel {
         }
         return objects
     }
+
+    async getUsers(lat, lon) {
+        const usersFromServer = await CommunicationController.nearbyUsers(this.sid, lat, lon)
+        let users = []
+
+        for (const user of usersFromServer) {
+            let userFromDB = await this.db.selectUserFrom(user.uid)
+            if (userFromDB.length === 0) {
+                let userFromServer = await CommunicationController.userInformation(this.sid, user.uid)
+                await this.db.insertUser(userFromServer)
+            } else if (userFromDB[0].profileversion !== user.profileversion) {
+                let userFromServer = await CommunicationController.userInformation(this.sid, user.uid)
+                await this.db.updateUser(userFromServer)
+            }
+            userFromDB = await this.db.selectUserFrom(user.uid)
+            users.push({...userFromDB[0], life: user.life, experience: user.experience, lat: user.lat, lon: user.lon})
+        }
+        return users
+    }
 }
