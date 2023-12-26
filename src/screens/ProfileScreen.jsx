@@ -1,5 +1,4 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
-import ProfileViewModel from "../viewmodels/ProfileViewModel";
 import * as ImagePicker from "expo-image-picker";
 import {
     Appbar,
@@ -15,28 +14,25 @@ import {
     TextInput
 } from "react-native-paper";
 import {FlatList, ScrollView} from "react-native";
-import {DB, SessionID} from "../Contexts";
-import {iconsObjects, ObjectAvatar, UserAvatar} from "../components/MyAvatar";
+import {SessionID} from "../Contexts";
+import {ObjectAvatar, UserAvatar} from "../components/MyAvatar";
+import {getArtifacts, getUser, updateUser} from "../viewmodels/ProfileViewModel";
 
 const ProfileContext = createContext()
 
 export default function ProfileScreen() {
     const sid = useContext(SessionID)
-    const db = useContext(DB)
-    const viewModel = new ProfileViewModel(sid, db)
 
     const [user, setUser] = useState(null)
     const [editNameVisible, setEditNameVisible] = useState(false)
 
     useEffect(() => {
-        viewModel.getUser()
-            .then(value => setUser(value))
+        getUser(sid).then(setUser)
     }, [])
 
     useEffect(() => {
-        if (user)
-            viewModel.updateUser(user)
-    }, [user]);
+        if (user) updateUser(sid, user)
+    }, [user])
 
     const updateImage = async () => {
         let image = await ImagePicker.launchImageLibraryAsync({
@@ -49,9 +45,10 @@ export default function ProfileScreen() {
     }
 
     return (
-        <ProfileContext.Provider value={{viewModel, user, setUser, editNameVisible, setEditNameVisible}}>
+        <ProfileContext.Provider value={{user, setUser, editNameVisible, setEditNameVisible}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Profile"/>
+                <Appbar.Action icon='refresh' onPress={() => getUser(sid).then(setUser)}/>
             </Appbar.Header>
             {user &&
                 <ScrollView>
@@ -105,12 +102,11 @@ export default function ProfileScreen() {
 }
 
 function MyArtifacts() {
-    const {viewModel, user} = useContext(ProfileContext)
+    const {user} = useContext(ProfileContext)
 
     const [artifacts, setArtifacts] = useState([])
     useEffect(() => {
-        viewModel.getArtifacts(user)
-            .then(value => setArtifacts(value))
+        getArtifacts(user).then(setArtifacts)
     }, []);
 
 

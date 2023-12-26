@@ -8,6 +8,7 @@ import * as Location from "expo-location";
 import StorageManager from "./models/StorageManager";
 import MapScreen from "./screens/MapScreen";
 import RankingScreen from "./screens/RankingScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 export default function App() {
     const [sid, setSid] = useState(null)
@@ -23,13 +24,13 @@ export default function App() {
         {key: 'map', title: 'Map', focusedIcon: 'map', unfocusedIcon: 'map-outline'},
         {key: 'objects', title: 'Objects', focusedIcon: 'view-list', unfocusedIcon: 'view-list-outline'},
         {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
-        //{key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
+        {key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
     ])
 
     const renderScene = BottomNavigation.SceneMap({
         map: MapScreen,
         objects: ObjectsScreen,
-        //profile: ProfileScreen,
+        profile: ProfileScreen,
         ranking: RankingScreen
     })
 
