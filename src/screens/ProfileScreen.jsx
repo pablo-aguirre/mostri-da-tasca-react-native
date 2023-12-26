@@ -20,6 +20,8 @@ import {getArtifacts, getUser, updateUser} from "../viewmodels/ProfileViewModel"
 
 const ProfileContext = createContext()
 
+// TODO rendere dati del profilo non dipendenti dal server (salvarli nello storage locale)
+
 export default function ProfileScreen() {
     const sid = useContext(SessionID)
 
