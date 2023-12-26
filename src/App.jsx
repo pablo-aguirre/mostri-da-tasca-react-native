@@ -7,6 +7,7 @@ import ObjectsScreen from "./screens/ObjectsScreen";
 import * as Location from "expo-location";
 import StorageManager from "./models/StorageManager";
 import MapScreen from "./screens/MapScreen";
+import RankingScreen from "./screens/RankingScreen";
 
 export default function App() {
     const [sid, setSid] = useState(null)
@@ -21,7 +22,7 @@ export default function App() {
     const [routes] = useState([
         {key: 'map', title: 'Map', focusedIcon: 'map', unfocusedIcon: 'map-outline'},
         {key: 'objects', title: 'Objects', focusedIcon: 'view-list', unfocusedIcon: 'view-list-outline'},
-        //{key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
+        {key: 'ranking', title: 'Ranking List', focusedIcon: 'trophy', unfocusedIcon: 'trophy-outline'},
         //{key: 'profile', title: 'Profile', focusedIcon: 'account', unfocusedIcon: 'account-outline'},
     ])
 
@@ -29,7 +30,7 @@ export default function App() {
         map: MapScreen,
         objects: ObjectsScreen,
         //profile: ProfileScreen,
-        //ranking: RankingScreen
+        ranking: RankingScreen
     })
 
     return (sid &&

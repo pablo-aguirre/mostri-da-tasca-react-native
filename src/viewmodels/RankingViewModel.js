@@ -1,14 +1,8 @@
 import CommunicationController from "../models/CommunicationController"
 import {usersFromDB} from "./MapScreenViewModel";
 
-export default class RankingViewModel {
-    constructor(sid, db) {
-        this.sid = sid
-        this.db = db
-    }
 
-    async getRanking() {
-        const rankingList = await CommunicationController.ranking(this.sid)
-        return usersFromDB(rankingList)
-    }
+export async function getRankingList(sid) {
+    const rankingList = await CommunicationController.ranking(sid)
+    return usersFromDB(sid, rankingList)
 }
