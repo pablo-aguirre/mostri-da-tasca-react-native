@@ -1,24 +1,24 @@
 import CommunicationController from "../models/CommunicationController";
+import StorageManager from "../models/StorageManager";
 
-export class MapScreenViewModel {
-    constructor(sid, db) {
-        this.sid = sid
-        this.db = db
-    }
-
-    async getObjects(lat, lon) {
-        const objectsFromServer = await CommunicationController.nearbyObjects(this.sid, lat, lon)
-
-        let objects = []
-        for (let object of objectsFromServer) {
-            let objectFromDB = await this.db.selectObjectFrom(object.id)
-            if (objectFromDB.length === 0) {
-                let objectFromServer = await CommunicationController.objectInformation(this.sid, object.id)
-                await this.db.insertObject(objectFromServer)
-            }
-            objectFromDB = await this.db.selectObjectFrom(object.id)
-            objects.push({...objectFromDB[0], lat: object.lat, lon: object.lon})
+export async function usersFromDB(sid, usersFromServer) {
+    let users = []
+    for (const user of usersFromServer) {
+        let userFromDB = await StorageManager.selectUserFrom(user.uid)
+        if (userFromDB.length === 0) {
+            let userFromServer = await CommunicationController.userInformation(sid, user.uid)
+            await StorageManager.insertUser(userFromServer)
+        } else if (userFromDB[0].profileversion !== user.profileversion) {
+            let userFromServer = await CommunicationController.userInformation(sid, user.uid)
+            await StorageManager.updateUser(userFromServer)
         }
-        return objects
+        userFromDB = await StorageManager.selectUserFrom(user.uid)
+        users.push({...userFromDB[0], life: user.life, experience: user.experience, lat: user.lat, lon: user.lon})
     }
+    return users
+}
+
+export async function getNearbyUsers(sid, lat, lon) {
+    const usersFromServer = await CommunicationController.nearbyUsers(sid, lat, lon)
+    return await usersFromDB(sid, usersFromServer)
 }
