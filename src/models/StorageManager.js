@@ -1,23 +1,17 @@
 import * as SQLite from "expo-sqlite";
 
 export default class StorageManager {
-    constructor() {
-        this.db = SQLite.openDatabase('users')
-        this.initDB()
-    }
 
-    async genericQuery(sql, args = []) {
+    static async genericQuery(sql, args = []) {
+        const db = SQLite.openDatabase('miaApp')
         let query = {args: args, sql: sql}
-        let result
-        try {
-            result = await this.db.execAsync([query], false)
-        } catch (e) {
-            console.error(`[genericQuery: ${query.sql}] ${e}`)
-        }
+        console.log(`[StorageManager] ${JSON.stringify(query)}`)
+        let result = await db.execAsync([query], false)
+        db.closeAsync()
         return result[0].rows
     }
 
-    async initDB() {
+    static async initDB() {
         let queries = [
             //'DROP TABLE users',
             //'DROP TABLE objects',
@@ -36,39 +30,39 @@ export default class StorageManager {
                     )`
         ]
         for (let query of queries)
-            await this.genericQuery(query)
+            await StorageManager.genericQuery(query)
     }
 
-    async insertUser(user) {
-        await this.genericQuery(
+    static async insertUser(user) {
+        await StorageManager.genericQuery(
             'INSERT INTO users(uid, profileversion, name, picture) VALUES (?, ?, ?, ?)',
             [user.uid, user.profileversion, user.name, user.picture]
         )
     }
 
-    async updateUser(user) {
-        await this.genericQuery(
+    static async updateUser(user) {
+        await StorageManager.genericQuery(
             'UPDATE users SET profileversion = ?, name = ?, picture = ? WHERE uid = ?',
             [user.profileversion, user.name, user.picture, user.uid]
         )
     }
 
-    async selectUserFrom(uid) {
-        return await this.genericQuery(
+    static async selectUserFrom(uid) {
+        return await StorageManager.genericQuery(
             'SELECT * FROM users WHERE uid = ?',
             [uid]
         )
     }
 
-    async insertObject(object) {
-        return await this.genericQuery(
+    static async insertObject(object) {
+        return await StorageManager.genericQuery(
             'INSERT INTO objects(id, name, type, level, image) VALUES (?, ?, ?, ?, ?)',
             [object.id, object.name, object.type, object.level, object.image]
         )
     }
 
-    async selectObjectFrom(id) {
-        return await this.genericQuery(
+    static async selectObjectFrom(id) {
+        return await StorageManager.genericQuery(
             'SELECT * FROM objects WHERE id = ?',
             [id]
         )

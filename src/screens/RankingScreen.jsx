@@ -1,7 +1,7 @@
 import {FlatList, View} from "react-native";
 import React, {createContext, useContext, useEffect, useState} from "react";
 import RankingViewModel from "../viewmodels/RankingViewModel";
-import {Appbar, Divider, IconButton, List} from "react-native-paper";
+import {Appbar, Divider, IconButton, List, MD3Colors} from "react-native-paper";
 import {DB, SessionID} from "../Contexts";
 import {UserAvatar} from "../components/MyAvatar";
 import MyDialog from "../components/MyDialog";
@@ -61,8 +61,8 @@ function SingleRow({user}) {
                 left={() => <UserAvatar user={user}/>}
                 right={() =>
                     <IconButton
-                        mode={"contained"}
-                        icon={"account-details"}
+                        style={{alignSelf: 'center'}}
+                        icon={"information-outline"}
                         onPress={() => {
                             setSelectedUser(user)
                             setDialogVisible(true)
