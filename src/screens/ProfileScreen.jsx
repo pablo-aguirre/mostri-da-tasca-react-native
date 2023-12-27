@@ -20,8 +20,6 @@ import {getArtifacts, getUser, updateUser} from "../viewmodels/ProfileViewModel"
 
 const ProfileContext = createContext()
 
-// TODO rendere dati del profilo non dipendenti dal server (salvarli nello storage locale)
-
 export default function ProfileScreen() {
     const sid = useContext(SessionID)
 
@@ -32,18 +30,17 @@ export default function ProfileScreen() {
         getUser(sid).then(setUser)
     }, [])
 
-    useEffect(() => {
-        if (user) updateUser(sid, user)
-    }, [user])
-
     const updateImage = async () => {
         let image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             base64: true,
             quality: 0
         })
-        if (!image.canceled)
-            setUser({...user, picture: image.assets[0].base64})
+        if (!image.canceled) {
+            updateUser(sid, {...user, picture: image.assets[0].base64})
+                .then(() => setUser({...user, picture: image.assets[0].base64}))
+                .catch(() => alert('Error while updating image'))
+        }
     }
 
     return (
@@ -77,8 +74,14 @@ export default function ProfileScreen() {
                         style={{paddingHorizontal: 10}}
                         title={user.positionshare ? 'Position shared' : 'Position not shared'}
                         left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}
-                        right={() => <Switch value={user.positionshare}
-                                             onValueChange={(value) => setUser({...user, positionshare: value})}/>}
+                        right={() =>
+                            <Switch value={user.positionshare}
+                                    onValueChange={(value) => updateUser(sid, {...user, positionshare: value})
+                                        .then(() => setUser({...user, positionshare: value}))
+                                        .catch(() => alert('Error while updating position share'))
+                                    }
+                            />
+                        }
                     />
                     <Divider/>
                     <List.Item
@@ -107,35 +110,37 @@ function MyArtifacts() {
     const {user} = useContext(ProfileContext)
 
     const [artifacts, setArtifacts] = useState([])
+
     useEffect(() => {
         getArtifacts(user).then(setArtifacts)
-    }, []);
-
+    }, [user]);
 
     return (
-        <FlatList horizontal showsVerticalScrollIndicator={false} data={artifacts} renderItem={({item}) => {
-            return (
-                <Card>
-                    <Card.Title title={item.name}/>
-                    <Card.Content>
-                        <ObjectAvatar object={item} large/>
-                        <List.Item
-                            title={'type'}
-                            right={() => <Text>{item.type}</Text>}
-                        />
-                        <List.Item
-                            title={'level'}
-                            right={() => <Text>{item.level}</Text>}
-                        />
-                    </Card.Content>
-                </Card>
-            )
-        }
-        }/>
+        <FlatList style={{padding: 5}} horizontal showsVerticalScrollIndicator={false} data={artifacts}
+                  renderItem={({item}) => {
+                      return (
+                          <Card>
+                              <Card.Title title={item.name}/>
+                              <Card.Content>
+                                  <ObjectAvatar object={item} large/>
+                                  <List.Item
+                                      title={'type'}
+                                      right={() => <Text>{item.type}</Text>}
+                                  />
+                                  <List.Item
+                                      title={'level'}
+                                      right={() => <Text>{item.level}</Text>}
+                                  />
+                              </Card.Content>
+                          </Card>
+                      )
+                  }
+                  }/>
     )
 }
 
 function EditName() {
+    const sid = useContext(SessionID)
     const {user, setUser, editNameVisible, setEditNameVisible} = useContext(ProfileContext)
     const [newName, setNewName] = useState('')
 
@@ -158,7 +163,9 @@ function EditName() {
                     <Button onPress={() => setEditNameVisible(false)}>Cancel</Button>
                     <Button
                         onPress={() => {
-                            setUser({...user, name: newName})
+                            updateUser(sid, {...user, name: newName})
+                                .then(() => setUser({...user, name: newName}))
+                                .catch(() => alert('Error while updating name'))
                             setEditNameVisible(false)
                         }}
                         disabled={!isValid(newName)}>
