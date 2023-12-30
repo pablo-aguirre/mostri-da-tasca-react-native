@@ -13,7 +13,14 @@ export async function usersFromDB(sid, usersFromServer) {
             await StorageManager.updateUser(userFromServer)
         }
         userFromDB = await StorageManager.selectUserFrom(user.uid)
-        users.push({...userFromDB[0], life: user.life, experience: user.experience, lat: user.lat, lon: user.lon})
+        users.push({
+            ...userFromDB[0],
+            life: user.life,
+            experience: user.experience,
+            positionshare: user.positionshare,
+            lat: user.lat,
+            lon: user.lon
+        })
     }
     return users
 }
