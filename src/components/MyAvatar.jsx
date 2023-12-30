@@ -10,7 +10,7 @@ export const iconsObjects = {
 }
 
 function size(large) {
-    return large ? 150 : 75
+    return large ? 200 : 100
 }
 
 export function UserAvatar({user, large}) {

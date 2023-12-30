@@ -34,7 +34,8 @@ export default function ProfileScreen() {
         let image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             base64: true,
-            quality: 0
+            quality: 0,
+            allowsEditing: true,
         })
         if (!image.canceled) {
             updateUser(sid, {...user, picture: image.assets[0].base64})
