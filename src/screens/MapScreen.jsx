@@ -8,7 +8,6 @@ import {getNearbyUsers} from "../viewmodels/MapScreenViewModel";
 import ObjectDialog from "../components/ObjectDialog";
 import {getNearbyObjects} from "../viewmodels/ObjectsListViewModel";
 import UserDialog from "../components/UserDialog";
-import {COLORS} from "../../styles/global";
 
 const MapContext = createContext()
 
@@ -81,7 +80,7 @@ function MyMarker({item}) {
     return (
         <Marker coordinate={{latitude: item.lat, longitude: item.lon}} onPress={enableDialog}>
             <Icon size={40} color={DefaultTheme.colors.primary}
-                source={item.type ? iconsObjects[item.type] : 'account'}/>
+                  source={item.type ? iconsObjects[item.type] : 'account'}/>
         </Marker>
     )
 }

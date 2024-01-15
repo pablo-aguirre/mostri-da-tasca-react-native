@@ -1,4 +1,4 @@
-import {FlatList, View} from "react-native";
+import {FlatList} from "react-native";
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {Appbar, Divider, IconButton, List} from "react-native-paper";
 import {SessionID} from "../Contexts";
