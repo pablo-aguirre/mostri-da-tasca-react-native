@@ -1,6 +1,6 @@
 import {FlatList} from "react-native";
 import React, {createContext, useContext, useEffect, useState} from "react";
-import {Appbar, Divider, IconButton, List} from "react-native-paper";
+import {ActivityIndicator, Appbar, Divider, IconButton, List} from "react-native-paper";
 import {SessionID} from "../Contexts";
 import {UserAvatar} from "../components/MyAvatar";
 import {getRankingList} from "../viewmodels/RankingViewModel";
@@ -32,7 +32,8 @@ export default function RankingScreen() {
                 <Appbar.Action icon={'refresh'} onPress={() => updateRankingList()}/>
             </Appbar.Header>
 
-            <FlatList
+            {rankingData.length === 0 ? <ActivityIndicator size='large' style={{flex: 1}}/> :
+                <FlatList
                 data={rankingData}
                 renderItem={({item}) =>
                     <SingleRow
@@ -41,7 +42,7 @@ export default function RankingScreen() {
                         setDialogVisible={setDialogVisible}
                     />
                 }
-            />
+            />}
             {selectedUser && <UserDialog user={selectedUser} visible={dialogVisible} setVisible={setDialogVisible}/>}
         </RankingListContext.Provider>
     )

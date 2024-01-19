@@ -1,10 +1,10 @@
-import {Appbar, Chip, Divider, IconButton, List} from "react-native-paper";
-import {FlatList} from "react-native";
+import {ActivityIndicator, Appbar, Chip, Divider, IconButton, List} from "react-native-paper";
 import {useContext, useEffect, useState} from "react";
 import {getNearbyObjects, isActivable} from "../viewmodels/ObjectsListViewModel";
 import {CurrentLocation, SessionID} from "../Contexts";
 import {ObjectAvatar} from "../components/MyAvatar";
 import ObjectDialog from "../components/ObjectDialog";
+import {FlatList} from "react-native";
 
 export default function ObjectsScreen() {
     const sid = useContext(SessionID)
@@ -30,12 +30,17 @@ export default function ObjectsScreen() {
                 <Appbar.Content title="Nearby objects"/>
                 <Appbar.Action icon={'refresh'} onPress={updateObjects}/>
             </Appbar.Header>
-            <FlatList
-                data={objects}
-                renderItem={({item}) => <SingleRow object={item} setSelected={setSelected}
-                                                   setVisibleDialog={setVisibleDialog}/>}
-            />
-            {selected && <ObjectDialog visible={visibleDialog} object={selected} setVisible={setVisibleDialog}/>}
+            {objects.length === 0 ? <ActivityIndicator size='large' style={{flex: 1}}/> :
+                <FlatList
+                    data={objects}
+                    renderItem={({item}) => <SingleRow object={item} setSelected={setSelected}
+                                                       setVisibleDialog={setVisibleDialog}/>}
+                />
+
+            }
+            {
+                selected && <ObjectDialog visible={visibleDialog} object={selected} setVisible={setVisibleDialog}/>
+            }
         </>
     )
 }

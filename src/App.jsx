@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {BottomNavigation, PaperProvider} from "react-native-paper";
+import {ActivityIndicator, BottomNavigation, PaperProvider} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CommunicationController from "./models/CommunicationController";
 import {CurrentLocation, SessionID} from "./Contexts";
@@ -34,18 +34,19 @@ export default function App() {
         ranking: RankingScreen
     })
 
-    return (sid &&
-        <CurrentLocation.Provider value={location}>
-            <SessionID.Provider value={sid}>
-                <PaperProvider>
-                    <BottomNavigation
-                        navigationState={{index, routes}}
-                        onIndexChange={setIndex}
-                        renderScene={renderScene}
-                    />
-                </PaperProvider>
-            </SessionID.Provider>
-        </CurrentLocation.Provider>
+    return (
+        sid === null ? <ActivityIndicator size='large' style={{flex: 1}}/> :
+            <CurrentLocation.Provider value={location}>
+                <SessionID.Provider value={sid}>
+                    <PaperProvider>
+                        <BottomNavigation
+                            navigationState={{index, routes}}
+                            onIndexChange={setIndex}
+                            renderScene={renderScene}
+                        />
+                    </PaperProvider>
+                </SessionID.Provider>
+            </CurrentLocation.Provider>
     )
 }
 

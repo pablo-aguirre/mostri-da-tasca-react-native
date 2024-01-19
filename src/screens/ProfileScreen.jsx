@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import * as ImagePicker from "expo-image-picker";
 import {
+    ActivityIndicator,
     Appbar,
     Button,
     Card,
@@ -13,7 +14,7 @@ import {
     Text,
     TextInput
 } from "react-native-paper";
-import {FlatList, ScrollView} from "react-native";
+import {FlatList, ScrollView, View} from "react-native";
 import {SessionID} from "../Contexts";
 import {ObjectAvatar, UserAvatar} from "../components/MyAvatar";
 import {getArtifacts, getUser, updateUser} from "../viewmodels/ProfileViewModel";
@@ -50,9 +51,10 @@ export default function ProfileScreen() {
         <ProfileContext.Provider value={{user, setUser, editNameVisible, setEditNameVisible}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Profile"/>
-                <Appbar.Action icon='refresh' onPress={() => getUser(sid).then(setUser).catch(() => alert("Connection error."))}/>
+                <Appbar.Action icon='refresh'
+                               onPress={() => getUser(sid).then(setUser).catch(() => alert("Connection error."))}/>
             </Appbar.Header>
-            {user &&
+            {!user ? <ActivityIndicator size='large' style={{flex: 1}}/> :
                 <ScrollView>
                     <Text variant='headlineMedium' style={{alignSelf: 'center'}}>{user.name}</Text>
                     <UserAvatar user={user} large/>
