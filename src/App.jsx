@@ -53,7 +53,13 @@ async function getSessionID() {
     let sid = await AsyncStorage.getItem('sid')
     if (sid === null) {
         await StorageManager.initDB()
-        const session = await CommunicationController.newSession()
+        let session
+        try {
+            session = await CommunicationController.newSession()
+        } catch (e) {
+            alert("Connection error, restart the app when there is connection.")
+            return null
+        }
         sid = session.sid
         await AsyncStorage.setItem('sid', session.sid)
         await AsyncStorage.setItem('uid', session.uid.toString())
