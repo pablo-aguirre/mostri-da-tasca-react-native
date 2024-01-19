@@ -61,7 +61,7 @@ function MyMap() {
             showsMyLocationButton
             provider='google'
             showsUserLocation
-            scrollEnabled={false}
+            //scrollEnabled={false}
             minZoomLevel={15}
             region={region}
             onRegionChangeComplete={setRegion}
