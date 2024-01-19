@@ -19,7 +19,9 @@ export default function ObjectsScreen() {
     }, []);
 
     const updateObjects = () => {
-        getNearbyObjects(sid, location.lat, location.lon).then(setObjects)
+        getNearbyObjects(sid, location.lat, location.lon)
+            .then(setObjects)
+            .catch(() => alert("Connection error."))
     }
 
     return (
