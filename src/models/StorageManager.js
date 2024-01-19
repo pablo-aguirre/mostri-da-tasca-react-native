@@ -5,7 +5,7 @@ export default class StorageManager {
     static async genericQuery(sql, args = []) {
         const db = SQLite.openDatabase('miaApp')
         let query = {args: args, sql: sql}
-        console.log(`[StorageManager] ${JSON.stringify(query)}`)
+        //console.log(`[StorageManager] ${JSON.stringify(query)}`)
         let result = await db.execAsync([query], false)
         db.closeAsync()
         return result[0].rows
