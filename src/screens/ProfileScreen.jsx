@@ -5,6 +5,7 @@ import {
     Appbar,
     Button,
     Card,
+    DefaultTheme,
     Dialog,
     Divider,
     IconButton,
@@ -14,7 +15,7 @@ import {
     Text,
     TextInput
 } from "react-native-paper";
-import {FlatList, ScrollView, View} from "react-native";
+import {FlatList, ScrollView} from "react-native";
 import {SessionID} from "../Contexts";
 import {ObjectAvatar, UserAvatar} from "../components/MyAvatar";
 import {getArtifacts, getUser, updateUser} from "../viewmodels/ProfileViewModel";
@@ -66,7 +67,7 @@ export default function ProfileScreen() {
                     <List.Item
                         style={{paddingHorizontal: 10}}
                         title='Name'
-                        left={() => <List.Icon icon='card-account-details'/>}
+                        left={() => <List.Icon icon='card-account-details' color={DefaultTheme.colors.primary}/>}
                         right={() =>
                             <IconButton
                                 icon='account-edit'
@@ -78,7 +79,8 @@ export default function ProfileScreen() {
                     <List.Item
                         style={{paddingHorizontal: 10}}
                         title={user.positionshare ? 'Position shared' : 'Position not shared'}
-                        left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}/>}
+                        left={() => <List.Icon icon={user.positionshare ? 'map-marker' : 'map-marker-off'}
+                                               color={DefaultTheme.colors.primary}/>}
                         right={() =>
                             <Switch value={user.positionshare}
                                     onValueChange={(value) => updateUser(sid, {...user, positionshare: value})
@@ -92,13 +94,13 @@ export default function ProfileScreen() {
                     <List.Item
                         style={{paddingHorizontal: 10}}
                         title='Life points'
-                        left={() => <List.Icon icon={'heart'}/>}
+                        left={() => <List.Icon icon={'heart'} color={DefaultTheme.colors.primary}/>}
                         right={() => <List.Subheader>{user.life}</List.Subheader>}
                     />
                     <List.Item
                         style={{paddingHorizontal: 10}}
                         title='Experience'
-                        left={() => <List.Icon icon={'chart-bar'}/>}
+                        left={() => <List.Icon icon={'chart-bar'} color={DefaultTheme.colors.primary}/>}
                         right={() => <List.Subheader>{user.experience}</List.Subheader>}
                     />
                     <Divider/>
@@ -130,10 +132,13 @@ function MyArtifacts() {
                                   <ObjectAvatar object={item} large/>
                                   <List.Item
                                       title={'type'}
+                                      left={() => <List.Icon icon='alphabetical-variant'
+                                                             color={DefaultTheme.colors.primary}/>}
                                       right={() => <Text>{item.type}</Text>}
                                   />
                                   <List.Item
                                       title={'level'}
+                                      left={() => <List.Icon icon='arm-flex' color={DefaultTheme.colors.primary}/>}
                                       right={() => <Text>{item.level}</Text>}
                                   />
                               </Card.Content>

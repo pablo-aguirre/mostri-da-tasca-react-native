@@ -1,4 +1,4 @@
-import {ActivityIndicator, Appbar, Chip, Divider, IconButton, List} from "react-native-paper";
+import {ActivityIndicator, Appbar, Chip, DefaultTheme, Divider, IconButton, List} from "react-native-paper";
 import {useContext, useEffect, useState} from "react";
 import {getNearbyObjects, isActivable} from "../viewmodels/ObjectsListViewModel";
 import {CurrentLocation, SessionID} from "../Contexts";
@@ -63,6 +63,7 @@ function SingleRow({object, setSelected, setVisibleDialog}) {
                 right={() =>
                     <IconButton
                         style={{alignSelf: 'center'}}
+                        iconColor={DefaultTheme.colors.primary}
                         icon={'information-outline'}
                         onPress={() => {
                             setSelected(object)

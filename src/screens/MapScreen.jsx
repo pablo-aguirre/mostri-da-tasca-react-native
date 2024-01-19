@@ -62,7 +62,7 @@ function MyMap() {
             provider='google'
             showsUserLocation
             //scrollEnabled={false}
-            //minZoomLevel={15}
+            minZoomLevel={15}
             region={region}
             onRegionChangeComplete={setRegion}
         >

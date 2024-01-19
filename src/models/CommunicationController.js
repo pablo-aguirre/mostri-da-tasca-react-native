@@ -14,7 +14,7 @@ export default class CommunicationController {
 
         const status = httpResponse.status
         if (status === 200) {
-            console.log(`[CommunicationController] Request ${verb} to ${url} successful`);
+            //console.log(`[CommunicationController] Request ${verb} to ${url} successful`);
             return await httpResponse.json()
         } else {
             const message = await httpResponse.text()
