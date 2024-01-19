@@ -20,7 +20,9 @@ export default function RankingScreen() {
     }, [])
 
     const updateRankingList = () => {
-        getRankingList(sid).then(setRankingData)
+        getRankingList(sid)
+            .then(setRankingData)
+            .catch(() => alert("Connection error, users load impossible."))
     }
 
     return (

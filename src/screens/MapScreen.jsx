@@ -45,8 +45,14 @@ function MyMap() {
 
     useEffect(() => {
         setRegion({...region, latitude: location.lat, longitude: location.lon})
-        getNearbyObjects(sid, location.lat, location.lon).then(setObjects)
-        getNearbyUsers(sid, location.lat, location.lon).then(setUsers)
+        if (location.lat !== 0) {
+            getNearbyObjects(sid, location.lat, location.lon)
+                .then(setObjects)
+                .catch(() => alert("Connection error, objects load impossible."))
+            getNearbyUsers(sid, location.lat, location.lon)
+                .then(setUsers)
+                .catch(() => alert("Connection error, users load impossible."))
+        }
     }, [location])
 
     return (

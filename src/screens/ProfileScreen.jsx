@@ -27,7 +27,9 @@ export default function ProfileScreen() {
     const [editNameVisible, setEditNameVisible] = useState(false)
 
     useEffect(() => {
-        getUser(sid).then(setUser)
+        getUser(sid)
+            .then(setUser)
+            .catch(() => alert("Connection error."))
     }, [])
 
     const updateImage = async () => {
@@ -48,7 +50,7 @@ export default function ProfileScreen() {
         <ProfileContext.Provider value={{user, setUser, editNameVisible, setEditNameVisible}}>
             <Appbar.Header mode='small' elevated>
                 <Appbar.Content title="Profile"/>
-                <Appbar.Action icon='refresh' onPress={() => getUser(sid).then(setUser)}/>
+                <Appbar.Action icon='refresh' onPress={() => getUser(sid).then(setUser).catch(() => alert("Connection error."))}/>
             </Appbar.Header>
             {user &&
                 <ScrollView>
