@@ -1,4 +1,4 @@
-import {Button, Dialog, Icon, List, Portal, Text} from "react-native-paper";
+import {Button, DefaultTheme, Dialog, Icon, List, Portal, Text} from "react-native-paper";
 import {UserAvatar} from "./MyAvatar";
 import MapView, {Marker} from "react-native-maps";
 
@@ -12,12 +12,12 @@ export default function UserDialog({visible, setVisible, user}) {
                 <Dialog.Content>
                     <UserAvatar user={user} large/>
                     <List.Item
-                        left={() => <List.Icon icon='heart'/>}
+                        left={() => <List.Icon icon='heart' color={DefaultTheme.colors.primary}/>}
                         title={'Life'}
                         right={() => <Text>{user.life}</Text>}
                     />
                     <List.Item
-                        left={() => <List.Icon icon='chart-bar'/>}
+                        left={() => <List.Icon icon='chart-bar' color={DefaultTheme.colors.primary}/>}
                         title={'Experience'}
                         right={() => <Text>{user.experience}</Text>}
                     />

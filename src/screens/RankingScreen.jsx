@@ -1,6 +1,6 @@
 import {FlatList} from "react-native";
 import React, {createContext, useContext, useEffect, useState} from "react";
-import {ActivityIndicator, Appbar, Divider, IconButton, List} from "react-native-paper";
+import {ActivityIndicator, Appbar, DefaultTheme, Divider, IconButton, List} from "react-native-paper";
 import {SessionID} from "../Contexts";
 import {UserAvatar} from "../components/MyAvatar";
 import {getRankingList} from "../viewmodels/RankingViewModel";
@@ -60,6 +60,7 @@ function SingleRow({user}) {
                 right={() =>
                     <IconButton
                         style={{alignSelf: 'center'}}
+                        iconColor={DefaultTheme.colors.primary}
                         icon={"information-outline"}
                         onPress={() => {
                             setSelectedUser(user)

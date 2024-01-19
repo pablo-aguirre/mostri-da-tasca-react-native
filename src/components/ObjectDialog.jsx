@@ -1,4 +1,4 @@
-import {Button, Dialog, List, Portal, Text} from "react-native-paper";
+import {Button, DefaultTheme, Dialog, List, Portal, Text} from "react-native-paper";
 import {iconsObjects, ObjectAvatar} from "./MyAvatar";
 import {activate, activationType, confirmationText, isActivable, titleText} from "../viewmodels/ObjectsListViewModel";
 import {useContext, useEffect, useState} from "react";
@@ -32,12 +32,12 @@ export default function ObjectDialog({visible, setVisible, object}) {
                 <Dialog.Content>
                     <ObjectAvatar object={object} large/>
                     <List.Item
-                        left={() => <List.Icon icon='alphabetical-variant'/>}
+                        left={() => <List.Icon icon='alphabetical-variant' color={DefaultTheme.colors.primary}/>}
                         title={'Type'}
                         right={() => <Text>{object.type}</Text>}
                     />
                     <List.Item
-                        left={() => <List.Icon icon='arm-flex'/>}
+                        left={() => <List.Icon icon='arm-flex' color={DefaultTheme.colors.primary}/>}
                         title={'Level'}
                         right={() => <Text>{object.level}</Text>}
                     />
